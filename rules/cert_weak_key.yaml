@@ -1,0 +1,10 @@
+rule_id: CERT-WEAK-KEY
+severity: high
+confidence_band: certain
+confidence: 1.0
+what: "The certificate's public key is below the minimum strength for its algorithm."
+why: "RSA keys below 2048 bits and elliptic-curve keys below 256 bits fall short of this rule's configured minimums. Ed25519 and Ed448 are not assessed by raw key size."
+fix: "Reissue the certificate with a key of at least 2048 bits (RSA) or an equivalent elliptic-curve key."
+remediation_id: reissue_certificate
+remediation_effort: cert_reissue
+references: ["NIST SP 800-131A"]

@@ -1,0 +1,104 @@
+# rules/v15_signals.yaml — passive signals identified in Reference Guide v2 §A.3.
+# Each rule is DATA. Conditions use the closed grammar in sms/judgement/conditions.py.
+
+- rule_id: TLS-DOWNGRADE-ANOMALY
+  severity: high
+  tier: OBSERVED
+  confidence_band: inferred
+  condition: tls.downgrade_anomaly == true      # set by downgrade_finding(); see note
+  what: "Client offered TLS 1.3, yet a 1.3-capable server negotiated a lower version."
+  why: >
+    RFC 8446 §4.1.3 requires a TLS 1.3-capable server to mark ServerHello.random when it
+    negotiates 1.2 or below. If the ClientHello we observed already offered 1.3, the
+    ClientHello the server received may have differed from the one captured here.
+    This is consistent with interference on the path. It is not proof of an attacker.
+  fix: "Check middleboxes between this capture point and the server; confirm the server's TLS policy."
+  remediation_effort: software_upgrade
+  references: ["RFC 8446 §4.1.3"]
+
+- rule_id: TLS-LEGACY-CLIENT
+  severity: info
+  tier: OBSERVED
+  confidence_band: certain
+  condition: tls.downgrade_legacy_client == true
+  what: "A TLS 1.3-capable server served a client that did not offer TLS 1.3."
+  why: "Expected behaviour under RFC 8446 §4.1.3. Recorded for inventory, not as a fault."
+  fix: "Upgrade the client where possible."
+  remediation_effort: software_upgrade
+  references: ["RFC 8446 §4.1.3"]
+
+- rule_id: TLS-FALLBACK-RETRY
+  severity: medium
+  tier: OBSERVED
+  confidence_band: certain
+  condition: tls.has_fallback_scsv == true
+  what: "The client signalled TLS_FALLBACK_SCSV: this connection is a retry after a failed handshake."
+  why: "Repeated fallback indicates an unstable or interfering path. Downgrade attempts rely on forcing retries."
+  fix: "Investigate why the first handshake failed."
+  remediation_effort: one_line_reload
+  references: ["RFC 7507"]
+
+- rule_id: TLS13-NO-FORWARD-SECRECY
+  severity: high
+  tier: OBSERVED
+  confidence_band: certain
+  condition: tls.forward_secrecy == "NO"
+  what: "TLS 1.3 session resumed with a pre-shared key and no (EC)DHE key share."
+  why: >
+    RFC 8446 §4.2.9 psk_ke mode establishes keys from the PSK alone. The session has no
+    forward secrecy: recorded traffic becomes readable if the PSK is later compromised.
+    TLS 1.3 is not unconditionally forward secret.
+  fix: "Configure the server to require psk_dhe_ke for resumption."
+  remediation_effort: one_line_reload
+  references: ["RFC 8446 §4.2.9"]
+
+- rule_id: TLS13-EARLY-DATA
+  severity: medium
+  tier: OBSERVED
+  confidence_band: certain
+  condition: tls.early_data_offered == true
+  what: "The client offered 0-RTT early data."
+  why: "Early data is not forward secret and is replayable by an on-path attacker."
+  fix: "Disable 0-RTT for mail submission unless replay is provably harmless."
+  remediation_effort: one_line_reload
+  references: ["RFC 8446 §2.3, §8"]
+
+- rule_id: TLS-ECH-IN-USE
+  severity: info
+  tier: NOT_OBSERVABLE
+  confidence_band: certain
+  condition: tls.ech_offered == true
+  what: "Encrypted Client Hello was offered: the destination hostname is hidden from this capture."
+  why: >
+    RFC 9849 encrypts the inner ClientHello, including SNI and the ALPN list. Server identity
+    resolution for this session falls back to IP and port, so evidence coverage is reduced.
+  fix: "None required. Recorded so that reduced coverage is visible rather than silent."
+  remediation_effort: none
+  references: ["RFC 9849"]
+
+- rule_id: TLS-NO-OCSP-STAPLING
+  severity: low
+  tier: OBSERVED
+  confidence_band: certain
+  condition: tls.ocsp_stapling == "requested_not_provided"
+  what: "The client requested a stapled OCSP response and the server did not provide one."
+  why: >
+    Without stapling, a client must contact the CA to check revocation, or skip the check.
+    Observable only in TLS 1.2: in TLS 1.3 the staple travels inside the encrypted Certificate.
+  fix: "Enable OCSP stapling on the mail server."
+  remediation_effort: one_line_reload
+  references: ["RFC 6066 §8", "RFC 6961"]
+
+- rule_id: SERVER-INCONSISTENT
+  severity: medium
+  tier: DEDUCED
+  confidence_band: inferred
+  condition: server.contradictions is not empty
+  what: "This server both demonstrated and firmly excluded the same capability."
+  why: >
+    A single server cannot do both. This indicates a load balancer with inconsistently
+    configured backends, TLS interception presenting as one endpoint, or a configuration
+    change during the capture.
+  fix: "Verify that every backend behind this address shares one TLS configuration."
+  remediation_effort: software_upgrade
+  references: []

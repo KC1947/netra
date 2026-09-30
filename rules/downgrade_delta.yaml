@@ -1,0 +1,10 @@
+rule_id: DOWNGRADE-DELTA
+severity: high
+confidence_band: certain
+confidence: 1.0
+what: "The negotiated TLS version is two or more steps below what the client offered."
+why: "A large gap between the offered and negotiated TLS version is the signature of an active protocol downgrade, not just an old server default."
+fix: "Confirm the server's configured minimum TLS version matches its intended policy, and check the network path for a downgrade proxy."
+remediation_id: investigate_downgrade
+remediation_effort: software_upgrade
+references: ["RFC 8446 Section 4.1.3"]

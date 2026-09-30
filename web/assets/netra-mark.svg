@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="NETRA">
+  <g fill="none" stroke="currentColor" stroke-linejoin="miter" stroke-miterlimit="6">
+    <path d="M128 21 L38.5 61.5 L38.5 120 C40 165 62 205 128 235 C194 205 216 165 217.5 120 L217.5 61.5 Z" stroke-width="10"/>
+    <path d="M45 129.5 Q128 39.5 211 129.5 Q128 219.5 45 129.5 Z" stroke-width="9.5"/>
+    <circle cx="128" cy="129.5" r="46.2" stroke-width="9.5"/>
+  </g>
+  <path fill="currentColor" d="M128 108.8a11.2 11.2 0 0 0-6.5 20.3L118.3 152.8h19.4l-3.2-23.7A11.2 11.2 0 0 0 128 108.8Z"/>
+</svg>

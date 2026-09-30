@@ -1,0 +1,153 @@
+{
+  "_note": "Hand-written answer key for the mixed enterprise fixture. This file was written before the fixture generator. NEVER edit it to make an analyser result pass; investigate the generator or engine and report disagreements.",
+  "capture": {
+    "fixture": "tests/fixtures/mixed_enterprise.pcap",
+    "expected_sessions": 25,
+    "expected_server_identities": 10,
+    "expected_hndl": {
+      "exposed_sessions": 24,
+      "quantum_safe_sessions": 1,
+      "total_sessions": 25,
+      "unobservable_sessions": 0,
+      "unobservable_sessions_excluded": 0,
+      "percent": 96
+    }
+  },
+  "servers": [
+    {
+      "server_id": "mx-order.corp.example@10.20.1.10:25",
+      "session_ids": ["s1", "s2", "s3", "s4", "s5", "s6"],
+      "expected_preference_mode": "server_order",
+      "preference_reason": "Opposite client orderings both select 0xc02f, while s3 separately demonstrates that the shared alternative 0x002f is supported.",
+      "expected_version_states": {
+        "version:0x0303": "DEMONSTRATED",
+        "version:0x0304": "DEMONSTRATED"
+      },
+      "expected_cipher_states": {
+        "cipher:0x002f": "DEMONSTRATED",
+        "cipher:0x1301": "UNDETERMINED",
+        "cipher:0x1302": "DEMONSTRATED",
+        "cipher:0xc02f": "DEMONSTRATED"
+      }
+    },
+    {
+      "server_id": "submit-client.corp.example@10.20.2.10:587",
+      "session_ids": ["s7", "s8", "s9", "s10", "s11", "s12"],
+      "expected_preference_mode": "client_order",
+      "preference_reason": "s7 and s8 offer the same two shared suites in opposite order and each receives its own first choice.",
+      "expected_version_states": {
+        "version:0x0303": "DEMONSTRATED",
+        "version:0x0304": "DEMONSTRATED"
+      },
+      "expected_cipher_states": {
+        "cipher:0x002f": "DEMONSTRATED",
+        "cipher:0x0035": "EXCLUDED_FIRM",
+        "cipher:0x1301": "DEMONSTRATED",
+        "cipher:0x1302": "DEMONSTRATED",
+        "cipher:0xc02f": "DEMONSTRATED"
+      }
+    },
+    {
+      "server_id": "relay-ambiguous.corp.example@10.20.3.10:465",
+      "session_ids": ["s13", "s14", "s15", "s16", "s17", "s18"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "The reversed TLS 1.2 clients both receive 0xc02f and the reversed TLS 1.3 clients both receive 0x1301, but neither alternative suite is ever separately demonstrated; server order and single-suite support remain equally consistent.",
+      "expected_version_states": {
+        "version:0x0303": "DEMONSTRATED",
+        "version:0x0304": "DEMONSTRATED"
+      },
+      "expected_cipher_states": {
+        "cipher:0x002f": "UNDETERMINED",
+        "cipher:0x1301": "DEMONSTRATED",
+        "cipher:0x1302": "UNDETERMINED",
+        "cipher:0xc02f": "DEMONSTRATED"
+      }
+    },
+    {
+      "server_id": "imap-legacy.corp.example@10.20.4.10:143",
+      "session_ids": ["s19"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "A single selected suite cannot distinguish client preference, server preference, or single-suite support.",
+      "expected_version_states": {"version:0x0302": "DEMONSTRATED"},
+      "expected_cipher_states": {"cipher:0xc02f": "DEMONSTRATED"}
+    },
+    {
+      "server_id": "imaps-ecdsa.corp.example@10.20.5.10:993",
+      "session_ids": ["s20"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "A single selected suite cannot establish an ordering policy.",
+      "expected_version_states": {"version:0x0303": "DEMONSTRATED"},
+      "expected_cipher_states": {"cipher:0xc02b": "DEMONSTRATED"}
+    },
+    {
+      "server_id": "pop-legacy.corp.example@10.20.6.10:110",
+      "session_ids": ["s21"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "A single selected suite cannot establish an ordering policy.",
+      "expected_version_states": {"version:0x0301": "DEMONSTRATED"},
+      "expected_cipher_states": {"cipher:0x002f": "DEMONSTRATED"}
+    },
+    {
+      "server_id": "pops-pq.corp.example@10.20.7.10:995",
+      "session_ids": ["s22"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "A single selected suite cannot establish an ordering policy.",
+      "expected_version_states": {"version:0x0304": "DEMONSTRATED"},
+      "expected_cipher_states": {"cipher:0x1301": "DEMONSTRATED"}
+    },
+    {
+      "server_id": "auth-clear.corp.example@10.20.8.10:25",
+      "session_ids": ["s23"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "No TLS ClientHello or ServerHello is present.",
+      "expected_version_states": {},
+      "expected_cipher_states": {}
+    },
+    {
+      "server_id": "strip-edge.corp.example@10.20.9.10:25",
+      "session_ids": ["s24"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "No TLS ClientHello or ServerHello is present after the suspicious capability substitution.",
+      "expected_version_states": {},
+      "expected_cipher_states": {}
+    },
+    {
+      "server_id": "submit-downgrade.corp.example@10.20.10.10:587",
+      "session_ids": ["s25"],
+      "expected_preference_mode": "unknown",
+      "preference_reason": "One negotiation cannot establish an ordering policy.",
+      "expected_version_states": {
+        "version:0x0303": "DEMONSTRATED",
+        "version:0x0304": "EXCLUDED_FIRM"
+      },
+      "expected_cipher_states": {"cipher:0xc02f": "DEMONSTRATED"}
+    }
+  ],
+  "sessions": [
+    {"id":"s1","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s2","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s3","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_RSA_WITH_AES_128_CBC_SHA","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s4","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","has_fallback_scsv":true,"hndl":"exposed"},
+    {"id":"s5","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_256_GCM_SHA384","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s6","server_id":"mx-order.corp.example@10.20.1.10:25","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_256_GCM_SHA384","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s7","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s8","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_RSA_WITH_AES_128_CBC_SHA","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s9","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s10","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s11","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_128_GCM_SHA256","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s12","server_id":"submit-client.corp.example@10.20.2.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_256_GCM_SHA384","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s13","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s14","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s15","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s16","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","hndl":"exposed"},
+    {"id":"s17","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_128_GCM_SHA256","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s18","server_id":"relay-ambiguous.corp.example@10.20.3.10:465","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_128_GCM_SHA256","certificate_status":"NOT_OBSERVABLE","hndl":"exposed"},
+    {"id":"s19","server_id":"imap-legacy.corp.example@10.20.4.10:143","protocol":"imap","transition_verdict":"upgraded","negotiated_version":"TLS1.1","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"INVALID","hndl":"exposed"},
+    {"id":"s20","server_id":"imaps-ecdsa.corp.example@10.20.5.10:993","protocol":"imap","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","certificate_key_type":"EC","certificate_curve":"secp256r1","hndl":"exposed"},
+    {"id":"s21","server_id":"pop-legacy.corp.example@10.20.6.10:110","protocol":"pop3","transition_verdict":"upgraded","negotiated_version":"TLS1.0","cipher":"TLS_RSA_WITH_AES_128_CBC_SHA","certificate_status":"INVALID","certificate_self_signed":true,"certificate_key_bits":1024,"hndl":"exposed"},
+    {"id":"s22","server_id":"pops-pq.corp.example@10.20.7.10:995","protocol":"pop3","transition_verdict":"upgraded","negotiated_version":"TLS1.3","cipher":"TLS_AES_128_GCM_SHA256","certificate_status":"NOT_OBSERVABLE","group":"X25519MLKEM768","hybrid_pq_flag":true,"hndl":"quantum_safe"},
+    {"id":"s23","server_id":"auth-clear.corp.example@10.20.8.10:25","protocol":"smtp","transition_verdict":"not_used","negotiated_version":null,"cipher":null,"certificate_status":"NOT_OBSERVABLE","expected_rule_ids":["STARTTLS-NOT-OFFERED","CLEARTEXT-AUTH"],"hndl":"exposed"},
+    {"id":"s24","server_id":"strip-edge.corp.example@10.20.9.10:25","protocol":"smtp","transition_verdict":"suspected","negotiated_version":null,"cipher":null,"certificate_status":"NOT_OBSERVABLE","expected_rule_ids":["STARTTLS-STRIP-SUSPECTED","CLEARTEXT-AUTH"],"hndl":"exposed"},
+    {"id":"s25","server_id":"submit-downgrade.corp.example@10.20.10.10:587","protocol":"smtp","transition_verdict":"upgraded","negotiated_version":"TLS1.2","cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","certificate_status":"VALID","has_fallback_scsv":true,"downgrade_sentinel":"settled_on_1.2","hndl":"exposed"}
+  ]
+}

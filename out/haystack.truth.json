@@ -1,0 +1,131 @@
+{
+  "background": {
+    "kind": "synthetic_non_mail",
+    "known_mail_sessions": 0,
+    "packets": 60000,
+    "path": "out/haystack_background.pcap",
+    "sha256": "f873d4d392b0a716d5daf87234a274bbd629515d11801f68a123dcf04d24c3cf",
+    "size_bytes": 5583914
+  },
+  "haystack": {
+    "packets": 60106,
+    "path": "out/haystack.pcap",
+    "sha256": "b887086be3c168577f459475dcf8539e708c61dae0f1006cce4f6be12017c68c",
+    "size_bytes": 5600898
+  },
+  "injected_flows": [
+    {
+      "flow_key": "10.0.0.10:40001|10.0.0.20:25",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.10:40002|10.0.0.20:25",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.10:40003|10.0.0.20:25",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.10:40004|10.0.0.20:25",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.10:40005|10.0.0.20:993",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.10:40006|10.0.0.20:465",
+      "source_capture": "out/sample.pcap"
+    },
+    {
+      "flow_key": "10.0.0.11:41001|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.12:41002|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.13:41003|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.14:41004|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.15:41005|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.16:41006|10.0.1.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.11:41001|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.12:41002|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.13:41003|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.14:41004|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.15:41005|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.16:41006|10.0.2.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.11:41001|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.12:41002|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.13:41003|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.14:41004|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.15:41005|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    },
+    {
+      "flow_key": "10.0.0.16:41006|10.0.3.20:465",
+      "source_capture": "out/multiclient.pcap"
+    }
+  ],
+  "injected_mail_sessions": 24,
+  "measurement_basis": "exact canonical TCP endpoint-pair intersection",
+  "needle_sources": [
+    {
+      "mail_sessions": 6,
+      "packets": 37,
+      "path": "out/sample.pcap",
+      "sha256": "91b96158a8985a64f3b84ba5e06963d73475e38286ed0f6b03be60a09a5a7408"
+    },
+    {
+      "mail_sessions": 18,
+      "packets": 69,
+      "path": "out/multiclient.pcap",
+      "sha256": "b69be23b188b9ad11b78d01131f621bb7cf1df320766a9c118522b4a2a5eb6f8"
+    }
+  ],
+  "schema_version": 1
+}

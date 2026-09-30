@@ -1,0 +1,10 @@
+rule_id: CERT-EXPIRED
+severity: high
+confidence_band: certain
+confidence: 1.0
+what: "The certificate was expired at the moment this session was captured."
+why: "A client that accepts an expired certificate loses any assurance the connection is authenticated to a specific server."
+fix: "Reissue the certificate before its notAfter date and monitor renewal lead time."
+remediation_id: reissue_certificate
+remediation_effort: cert_reissue
+references: ["RFC 5280 Section 4.1.2.5"]

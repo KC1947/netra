@@ -1,0 +1,42 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+output/
+
+# Private/local captures are ignored; the explicit release fixtures below ship.
+*.pcap
+*.pcapng
+!tests/fixtures/real_mail.pcap
+!tests/fixtures/unsupported_linktype_258.pcapng
+!tests/fixtures/recorded_mail_ethernet.pcapng
+!tests/fixtures/mixed_enterprise.pcap
+!tests/fixtures/audit_*.pcap
+!demo_captures/anomaly_certswap.pcap
+!demo_captures/clean_tls13.pcap
+!demo_captures/cleartext_auth.pcap
+!demo_captures/expired_cert.pcap
+!demo_captures/legacy_downgrade.pcap
+!demo_captures/mixed_enterprise.pcap
+!demo_captures/pq_ready.pcap
+!demo_captures/real_mail.pcap
+!demo_captures/strip_attack.pcap
+demo_captures/uploads/
+
+# Preserve the existing output paths used by tests and benchmarks. Generated
+# reports, local recordings and scratch output remain ignored.
+out/*
+!out/sample.pcap
+!out/anomaly_demo.pcap
+!out/baseline.pcap
+!out/multiclient.pcap
+!out/haystack.pcap
+!out/haystack_background.pcap
+!out/haystack.truth.json
+!out/m7_baseline/
+out/m7_baseline/*
+!out/m7_baseline/benign_101.pcap
+!out/m7_baseline/benign_102.pcap
+!out/m7_baseline/benign_103.pcap
+!out/m7_baseline/benign_104.pcap

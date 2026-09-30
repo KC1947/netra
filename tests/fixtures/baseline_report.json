@@ -1,0 +1,1226 @@
+{
+  "capture": {
+    "filename": "sample.pcap",
+    "first_ts": "2026-09-05T00:00:00+00:00",
+    "last_ts": "2026-09-05T00:00:02.860000+00:00",
+    "packets": 37,
+    "sha256": "d5290690138f961fca3cc312a0845b0cd8ba99447b0ce2b2dce4fc66ad76f5fe"
+  },
+  "findings": [
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 2,
+          "byte_offset": 63,
+          "display": "TLS1.0",
+          "field": "tls.server_hello.legacy_version",
+          "frame": 16
+        }
+      ],
+      "fix": "Disable TLS versions below 1.2 on this service and require TLS 1.2 or 1.3.",
+      "references": [
+        "RFC 8996",
+        "RFC 9325"
+      ],
+      "remediation_effort": "software_upgrade",
+      "remediation_id": "disable_legacy_tls",
+      "rule_id": "TLS-VER-DEPRECATED",
+      "severity": "critical",
+      "what": "Negotiated TLS version is deprecated (SSL3.0/TLS1.0/TLS1.1).",
+      "why": "TLS 1.0 and 1.1 lack modern AEAD ciphers and secure hash negotiation, and both are formally deprecated by RFC 8996."
+    },
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 4,
+          "byte_offset": 115,
+          "display": "TLS1.3",
+          "field": "tls.client_hello.supported_versions",
+          "frame": 15
+        },
+        {
+          "byte_length": 2,
+          "byte_offset": 63,
+          "display": "TLS1.0",
+          "field": "tls.server_hello.legacy_version",
+          "frame": 16
+        }
+      ],
+      "fix": "Confirm the server's configured minimum TLS version matches its intended policy, and check the network path for a downgrade proxy.",
+      "references": [
+        "RFC 8446 Section 4.1.3"
+      ],
+      "remediation_effort": "software_upgrade",
+      "remediation_id": "investigate_downgrade",
+      "rule_id": "DOWNGRADE-DELTA",
+      "severity": "high",
+      "what": "The negotiated TLS version is two or more steps below what the client offered.",
+      "why": "A large gap between the offered and negotiated TLS version is the signature of an active protocol downgrade, not just an old server default."
+    },
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 2,
+          "byte_offset": 98,
+          "display": "0x002f",
+          "field": "tls.server_hello.cipher_suite",
+          "frame": 16
+        }
+      ],
+      "fix": "Reorder the server's cipher preference to prefer AEAD suites (GCM/ChaCha20-Poly1305) ahead of CBC suites.",
+      "references": [
+        "RFC 9325 Section 4.2"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "prefer_aead_ciphers",
+      "rule_id": "CIPHER-CBC",
+      "severity": "medium",
+      "what": "The negotiated cipher suite uses CBC-mode encryption.",
+      "why": "CBC-mode TLS cipher suites have a history of padding-oracle and timing attacks (Lucky13, POODLE-adjacent issues)."
+    },
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 2,
+          "byte_offset": 98,
+          "display": "0x002f",
+          "field": "tls.server_hello.cipher_suite",
+          "frame": 16
+        }
+      ],
+      "fix": "Disable static-RSA key-exchange cipher suites and require (EC)DHE key exchange.",
+      "references": [
+        "RFC 9325 Section 4.1"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "require_forward_secrecy",
+      "rule_id": "KEX-NO-FS",
+      "severity": "medium",
+      "what": "The negotiated key exchange provides no forward secrecy.",
+      "why": "A static-RSA key exchange means captured traffic can be decrypted retroactively if the server's private key is ever recovered."
+    },
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 455,
+          "byte_offset": 69,
+          "display": "certificate DER",
+          "field": "tls.certificate",
+          "frame": 17
+        }
+      ],
+      "fix": "Issue a certificate from a trusted internal or public CA.",
+      "references": [
+        "RFC 5280 Section 4.1.2.4"
+      ],
+      "remediation_effort": "cert_reissue",
+      "remediation_id": "reissue_certificate",
+      "rule_id": "CERT-SELF-SIGNED",
+      "severity": "medium",
+      "what": "The certificate is self-signed (issuer equals subject).",
+      "why": "A self-signed certificate has no third-party chain of trust, so any client that accepts it is trusting the server's own claim about its identity."
+    },
+    {
+      "affected_sessions": [
+        "s2"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 455,
+          "byte_offset": 69,
+          "display": "certificate DER",
+          "field": "tls.certificate",
+          "frame": 17
+        }
+      ],
+      "fix": "Reissue the certificate with a key of at least 2048 bits (RSA) or an equivalent elliptic-curve key.",
+      "references": [
+        "NIST SP 800-131A"
+      ],
+      "remediation_effort": "cert_reissue",
+      "remediation_id": "reissue_certificate",
+      "rule_id": "CERT-WEAK-KEY",
+      "severity": "high",
+      "what": "The certificate's public key is shorter than 2048 bits.",
+      "why": "Keys below 2048 bits (RSA) fall short of current NIST/CA-Browser Forum minimums and are within reach of well-resourced factoring attacks."
+    },
+    {
+      "affected_sessions": [
+        "s3"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 22,
+          "byte_offset": 54,
+          "display": "redacted",
+          "field": "protocol.line",
+          "frame": 21
+        }
+      ],
+      "fix": "Enable STARTTLS on the SMTP service.",
+      "references": [
+        "RFC 3207"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "enable_starttls",
+      "rule_id": "STARTTLS-NOT-OFFERED",
+      "severity": "high",
+      "what": "SMTP did not advertise STARTTLS before authentication.",
+      "why": "The observed SMTP capability response lacks STARTTLS."
+    },
+    {
+      "affected_sessions": [
+        "s3"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 37,
+          "byte_offset": 54,
+          "display": "AUTH argument redacted",
+          "field": "cleartext-auth",
+          "frame": 22
+        }
+      ],
+      "fix": "Require TLS before authentication and disable cleartext AUTH.",
+      "references": [
+        "RFC 8314"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "require_tls_before_auth",
+      "rule_id": "CLEARTEXT-AUTH",
+      "severity": "critical",
+      "what": "Authentication command was observed in cleartext.",
+      "why": "Credentials sent before a TLS upgrade can be read from the capture."
+    },
+    {
+      "affected_sessions": [
+        "s4"
+      ],
+      "confidence": 0.5,
+      "confidence_band": "inferred",
+      "evidence": [
+        {
+          "byte_length": 8,
+          "byte_offset": 96,
+          "display": "250 XSNVVQRW",
+          "field": "smtp.capability",
+          "frame": 26
+        },
+        {
+          "byte_length": 37,
+          "byte_offset": 54,
+          "display": "AUTH argument redacted",
+          "field": "cleartext-auth",
+          "frame": 27
+        }
+      ],
+      "fix": "Require TLS before AUTH and investigate the mail path for capability modification.",
+      "references": [
+        "RFC 3207",
+        "RFC 8314"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "require_tls_before_auth",
+      "rule_id": "STARTTLS-STRIP-SUSPECTED",
+      "severity": "critical",
+      "what": "STARTTLS capability removal is suspected.",
+      "why": "An unknown eight-letter SMTP capability was followed by cleartext authentication."
+    },
+    {
+      "affected_sessions": [
+        "s4"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 37,
+          "byte_offset": 54,
+          "display": "AUTH argument redacted",
+          "field": "cleartext-auth",
+          "frame": 27
+        }
+      ],
+      "fix": "Require TLS before authentication and disable cleartext AUTH.",
+      "references": [
+        "RFC 8314"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "require_tls_before_auth",
+      "rule_id": "CLEARTEXT-AUTH",
+      "severity": "critical",
+      "what": "Authentication command was observed in cleartext.",
+      "why": "Credentials sent before a TLS upgrade can be read from the capture."
+    },
+    {
+      "affected_sessions": [
+        "s5"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 709,
+          "byte_offset": 69,
+          "display": "certificate DER",
+          "field": "tls.certificate",
+          "frame": 31
+        }
+      ],
+      "fix": "Reissue the certificate before its notAfter date and monitor renewal lead time.",
+      "references": [
+        "RFC 5280 Section 4.1.2.5"
+      ],
+      "remediation_effort": "cert_reissue",
+      "remediation_id": "reissue_certificate",
+      "rule_id": "CERT-EXPIRED",
+      "severity": "high",
+      "what": "The certificate was expired at the moment this session was captured.",
+      "why": "A client that accepts an expired certificate loses any assurance the connection is authenticated to a specific server."
+    },
+    {
+      "affected_sessions": [
+        "s6"
+      ],
+      "confidence": 1.0,
+      "confidence_band": "certain",
+      "evidence": [
+        {
+          "byte_length": 2,
+          "byte_offset": 113,
+          "display": "0x11ec",
+          "field": "tls.server_hello.key_share.group",
+          "frame": 35
+        }
+      ],
+      "fix": "No action needed; this session is already harvest-now-decrypt-later resistant.",
+      "references": [
+        "draft-ietf-tls-hybrid-design"
+      ],
+      "remediation_effort": "one_line_reload",
+      "remediation_id": "none",
+      "rule_id": "PQ-HYBRID-OBSERVED",
+      "severity": "info",
+      "what": "The session negotiated a hybrid post-quantum key exchange (X25519MLKEM768).",
+      "why": "A hybrid PQ key exchange is not retroactively decryptable by a future quantum computer, unlike classical-only (EC)DHE."
+    }
+  ],
+  "hndl": {
+    "exposed_sessions": 5,
+    "percent": 83,
+    "total_sessions": 6,
+    "unobservable_sessions": 0
+  },
+  "ml_summary": {
+    "anomalies": 4,
+    "baseline_sessions": 240,
+    "enabled": true,
+    "model": "IsolationForest+HBOS",
+    "threshold_percentile": 99
+  },
+  "sessions": [
+    {
+      "certificate": {
+        "expired": null,
+        "key_bits": null,
+        "notAfter": null,
+        "notBefore": null,
+        "reason": "certificate exchanged inside the encrypted TLS 1.3 handshake",
+        "self_signed": null,
+        "sig_alg": null,
+        "status": "NOT_OBSERVABLE"
+      },
+      "evidence_coverage": 75,
+      "findings": [],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40001,
+        "server_ip": "10.0.0.20",
+        "server_port": 25,
+        "transport": "tcp"
+      },
+      "id": "s1",
+      "ml": {
+        "anomaly_percentile": 22.5,
+        "anomaly_score": 0.46186166695959907,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": false,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 51.55038759689923,
+            "baseline_typical": 9.0,
+            "feature": "packet_count",
+            "value": 9.0
+          },
+          {
+            "baseline_share_pct": 54.73251028806584,
+            "baseline_typical": 0.0,
+            "feature": "implicit_tls",
+            "value": 0.0
+          },
+          {
+            "baseline_share_pct": 67.06349206349206,
+            "baseline_typical": -1.0,
+            "feature": "cert_key_bits",
+            "value": -1.0
+          }
+        ]
+      },
+      "observed_risk": 0,
+      "packets": {
+        "first": 1,
+        "last": 9
+      },
+      "protocol": "smtp",
+      "protocol_confidence": "high",
+      "tls": {
+        "cert_visibility": "NOT_OBSERVABLE",
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "downgrade_delta": 0,
+        "forward_secrecy": true,
+        "group": "x25519",
+        "hybrid_pq_flag": false,
+        "negotiated_version": "TLS1.3",
+        "offered_version": "TLS1.3"
+      },
+      "transition": {
+        "confidence_band": "certain",
+        "evidence": [
+          {
+            "byte_length": 10,
+            "byte_offset": 54,
+            "display": "redacted",
+            "field": "protocol.line",
+            "frame": 4
+          },
+          {
+            "byte_length": 30,
+            "byte_offset": 54,
+            "display": "redacted",
+            "field": "protocol.line",
+            "frame": 5
+          },
+          {
+            "byte_length": 5,
+            "byte_offset": 54,
+            "display": "TLS record",
+            "field": "tls.record",
+            "frame": 6
+          }
+        ],
+        "verdict": "upgraded"
+      }
+    },
+    {
+      "certificate": {
+        "expired": false,
+        "key_bits": 1024,
+        "notAfter": "2027-06-28T00:00:00+00:00",
+        "notBefore": "2026-08-02T00:00:00+00:00",
+        "reason": "self-signed; weak key (1024 bits)",
+        "self_signed": true,
+        "sig_alg": "sha256",
+        "status": "INVALID"
+      },
+      "evidence_coverage": 100,
+      "findings": [
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 2,
+              "byte_offset": 63,
+              "display": "TLS1.0",
+              "field": "tls.server_hello.legacy_version",
+              "frame": 16
+            }
+          ],
+          "fix": "Disable TLS versions below 1.2 on this service and require TLS 1.2 or 1.3.",
+          "references": [
+            "RFC 8996",
+            "RFC 9325"
+          ],
+          "remediation_effort": "software_upgrade",
+          "remediation_id": "disable_legacy_tls",
+          "rule_id": "TLS-VER-DEPRECATED",
+          "severity": "critical",
+          "what": "Negotiated TLS version is deprecated (SSL3.0/TLS1.0/TLS1.1).",
+          "why": "TLS 1.0 and 1.1 lack modern AEAD ciphers and secure hash negotiation, and both are formally deprecated by RFC 8996."
+        },
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 4,
+              "byte_offset": 115,
+              "display": "TLS1.3",
+              "field": "tls.client_hello.supported_versions",
+              "frame": 15
+            },
+            {
+              "byte_length": 2,
+              "byte_offset": 63,
+              "display": "TLS1.0",
+              "field": "tls.server_hello.legacy_version",
+              "frame": 16
+            }
+          ],
+          "fix": "Confirm the server's configured minimum TLS version matches its intended policy, and check the network path for a downgrade proxy.",
+          "references": [
+            "RFC 8446 Section 4.1.3"
+          ],
+          "remediation_effort": "software_upgrade",
+          "remediation_id": "investigate_downgrade",
+          "rule_id": "DOWNGRADE-DELTA",
+          "severity": "high",
+          "what": "The negotiated TLS version is two or more steps below what the client offered.",
+          "why": "A large gap between the offered and negotiated TLS version is the signature of an active protocol downgrade, not just an old server default."
+        },
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 2,
+              "byte_offset": 98,
+              "display": "0x002f",
+              "field": "tls.server_hello.cipher_suite",
+              "frame": 16
+            }
+          ],
+          "fix": "Reorder the server's cipher preference to prefer AEAD suites (GCM/ChaCha20-Poly1305) ahead of CBC suites.",
+          "references": [
+            "RFC 9325 Section 4.2"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "prefer_aead_ciphers",
+          "rule_id": "CIPHER-CBC",
+          "severity": "medium",
+          "what": "The negotiated cipher suite uses CBC-mode encryption.",
+          "why": "CBC-mode TLS cipher suites have a history of padding-oracle and timing attacks (Lucky13, POODLE-adjacent issues)."
+        },
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 2,
+              "byte_offset": 98,
+              "display": "0x002f",
+              "field": "tls.server_hello.cipher_suite",
+              "frame": 16
+            }
+          ],
+          "fix": "Disable static-RSA key-exchange cipher suites and require (EC)DHE key exchange.",
+          "references": [
+            "RFC 9325 Section 4.1"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "require_forward_secrecy",
+          "rule_id": "KEX-NO-FS",
+          "severity": "medium",
+          "what": "The negotiated key exchange provides no forward secrecy.",
+          "why": "A static-RSA key exchange means captured traffic can be decrypted retroactively if the server's private key is ever recovered."
+        },
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 455,
+              "byte_offset": 69,
+              "display": "certificate DER",
+              "field": "tls.certificate",
+              "frame": 17
+            }
+          ],
+          "fix": "Issue a certificate from a trusted internal or public CA.",
+          "references": [
+            "RFC 5280 Section 4.1.2.4"
+          ],
+          "remediation_effort": "cert_reissue",
+          "remediation_id": "reissue_certificate",
+          "rule_id": "CERT-SELF-SIGNED",
+          "severity": "medium",
+          "what": "The certificate is self-signed (issuer equals subject).",
+          "why": "A self-signed certificate has no third-party chain of trust, so any client that accepts it is trusting the server's own claim about its identity."
+        },
+        {
+          "affected_sessions": [
+            "s2"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 455,
+              "byte_offset": 69,
+              "display": "certificate DER",
+              "field": "tls.certificate",
+              "frame": 17
+            }
+          ],
+          "fix": "Reissue the certificate with a key of at least 2048 bits (RSA) or an equivalent elliptic-curve key.",
+          "references": [
+            "NIST SP 800-131A"
+          ],
+          "remediation_effort": "cert_reissue",
+          "remediation_id": "reissue_certificate",
+          "rule_id": "CERT-WEAK-KEY",
+          "severity": "high",
+          "what": "The certificate's public key is shorter than 2048 bits.",
+          "why": "Keys below 2048 bits (RSA) fall short of current NIST/CA-Browser Forum minimums and are within reach of well-resourced factoring attacks."
+        }
+      ],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40002,
+        "server_ip": "10.0.0.20",
+        "server_port": 25,
+        "transport": "tcp"
+      },
+      "id": "s2",
+      "ml": {
+        "anomaly_percentile": 100.0,
+        "anomaly_score": 47.92412445405765,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": true,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 0.3968253968253968,
+            "baseline_typical": -1.0,
+            "feature": "cert_key_bits",
+            "value": 1024.0
+          },
+          {
+            "baseline_share_pct": 0.4,
+            "baseline_typical": 1.0,
+            "feature": "cert_fp_share_for_server",
+            "value": 0.25
+          },
+          {
+            "baseline_share_pct": 0.4,
+            "baseline_typical": 0.0,
+            "feature": "downgrade_delta",
+            "value": 3.0
+          }
+        ]
+      },
+      "observed_risk": 80,
+      "packets": {
+        "first": 10,
+        "last": 18
+      },
+      "protocol": "smtp",
+      "protocol_confidence": "high",
+      "tls": {
+        "cert_visibility": "OBSERVABLE",
+        "cipher": "TLS_RSA_WITH_AES_128_CBC_SHA",
+        "downgrade_delta": 3,
+        "forward_secrecy": false,
+        "group": null,
+        "hybrid_pq_flag": false,
+        "negotiated_version": "TLS1.0",
+        "offered_version": "TLS1.3"
+      },
+      "transition": {
+        "confidence_band": "certain",
+        "evidence": [
+          {
+            "byte_length": 10,
+            "byte_offset": 54,
+            "display": "redacted",
+            "field": "protocol.line",
+            "frame": 13
+          },
+          {
+            "byte_length": 14,
+            "byte_offset": 54,
+            "display": "redacted",
+            "field": "protocol.line",
+            "frame": 14
+          },
+          {
+            "byte_length": 5,
+            "byte_offset": 54,
+            "display": "TLS record",
+            "field": "tls.record",
+            "frame": 15
+          }
+        ],
+        "verdict": "upgraded"
+      }
+    },
+    {
+      "certificate": {
+        "expired": null,
+        "key_bits": null,
+        "notAfter": null,
+        "notBefore": null,
+        "reason": "no Certificate message observed in this capture",
+        "self_signed": null,
+        "sig_alg": null,
+        "status": "NOT_OBSERVABLE"
+      },
+      "evidence_coverage": 100,
+      "findings": [
+        {
+          "affected_sessions": [
+            "s3"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 22,
+              "byte_offset": 54,
+              "display": "redacted",
+              "field": "protocol.line",
+              "frame": 21
+            }
+          ],
+          "fix": "Enable STARTTLS on the SMTP service.",
+          "references": [
+            "RFC 3207"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "enable_starttls",
+          "rule_id": "STARTTLS-NOT-OFFERED",
+          "severity": "high",
+          "what": "SMTP did not advertise STARTTLS before authentication.",
+          "why": "The observed SMTP capability response lacks STARTTLS."
+        },
+        {
+          "affected_sessions": [
+            "s3"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 37,
+              "byte_offset": 54,
+              "display": "AUTH argument redacted",
+              "field": "cleartext-auth",
+              "frame": 22
+            }
+          ],
+          "fix": "Require TLS before authentication and disable cleartext AUTH.",
+          "references": [
+            "RFC 8314"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "require_tls_before_auth",
+          "rule_id": "CLEARTEXT-AUTH",
+          "severity": "critical",
+          "what": "Authentication command was observed in cleartext.",
+          "why": "Credentials sent before a TLS upgrade can be read from the capture."
+        }
+      ],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40003,
+        "server_ip": "10.0.0.20",
+        "server_port": 25,
+        "transport": "tcp"
+      },
+      "id": "s3",
+      "ml": {
+        "anomaly_percentile": 100.0,
+        "anomaly_score": 42.02414487471298,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": true,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 0.4048582995951417,
+            "baseline_typical": 4.0,
+            "feature": "negotiated_version_ord",
+            "value": -1.0
+          },
+          {
+            "baseline_share_pct": 0.4048582995951417,
+            "baseline_typical": 4.0,
+            "feature": "offered_version_ord",
+            "value": -1.0
+          },
+          {
+            "baseline_share_pct": 0.411522633744856,
+            "baseline_typical": 1.0,
+            "feature": "aead_flag",
+            "value": 0.0
+          }
+        ]
+      },
+      "observed_risk": 90,
+      "packets": {
+        "first": 19,
+        "last": 23
+      },
+      "protocol": "smtp",
+      "protocol_confidence": "high",
+      "tls": {
+        "cert_visibility": "NOT_OBSERVABLE",
+        "cipher": null,
+        "downgrade_delta": 0,
+        "forward_secrecy": false,
+        "group": null,
+        "hybrid_pq_flag": false,
+        "negotiated_version": null,
+        "offered_version": null
+      },
+      "transition": {
+        "confidence_band": "certain",
+        "evidence": [
+          {
+            "byte_length": 22,
+            "byte_offset": 54,
+            "display": "redacted",
+            "field": "protocol.line",
+            "frame": 21
+          },
+          {
+            "byte_length": 37,
+            "byte_offset": 54,
+            "display": "AUTH argument redacted",
+            "field": "cleartext-auth",
+            "frame": 22
+          }
+        ],
+        "verdict": "not_used"
+      }
+    },
+    {
+      "certificate": {
+        "expired": null,
+        "key_bits": null,
+        "notAfter": null,
+        "notBefore": null,
+        "reason": "no Certificate message observed in this capture",
+        "self_signed": null,
+        "sig_alg": null,
+        "status": "NOT_OBSERVABLE"
+      },
+      "evidence_coverage": 50,
+      "findings": [
+        {
+          "affected_sessions": [
+            "s4"
+          ],
+          "confidence": 0.5,
+          "confidence_band": "inferred",
+          "evidence": [
+            {
+              "byte_length": 8,
+              "byte_offset": 96,
+              "display": "250 XSNVVQRW",
+              "field": "smtp.capability",
+              "frame": 26
+            },
+            {
+              "byte_length": 37,
+              "byte_offset": 54,
+              "display": "AUTH argument redacted",
+              "field": "cleartext-auth",
+              "frame": 27
+            }
+          ],
+          "fix": "Require TLS before AUTH and investigate the mail path for capability modification.",
+          "references": [
+            "RFC 3207",
+            "RFC 8314"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "require_tls_before_auth",
+          "rule_id": "STARTTLS-STRIP-SUSPECTED",
+          "severity": "critical",
+          "what": "STARTTLS capability removal is suspected.",
+          "why": "An unknown eight-letter SMTP capability was followed by cleartext authentication."
+        },
+        {
+          "affected_sessions": [
+            "s4"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 37,
+              "byte_offset": 54,
+              "display": "AUTH argument redacted",
+              "field": "cleartext-auth",
+              "frame": 27
+            }
+          ],
+          "fix": "Require TLS before authentication and disable cleartext AUTH.",
+          "references": [
+            "RFC 8314"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "require_tls_before_auth",
+          "rule_id": "CLEARTEXT-AUTH",
+          "severity": "critical",
+          "what": "Authentication command was observed in cleartext.",
+          "why": "Credentials sent before a TLS upgrade can be read from the capture."
+        }
+      ],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40004,
+        "server_ip": "10.0.0.20",
+        "server_port": 25,
+        "transport": "tcp"
+      },
+      "id": "s4",
+      "ml": {
+        "anomaly_percentile": 100.0,
+        "anomaly_score": 42.02414487471298,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": true,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 0.4048582995951417,
+            "baseline_typical": 4.0,
+            "feature": "negotiated_version_ord",
+            "value": -1.0
+          },
+          {
+            "baseline_share_pct": 0.4048582995951417,
+            "baseline_typical": 4.0,
+            "feature": "offered_version_ord",
+            "value": -1.0
+          },
+          {
+            "baseline_share_pct": 0.411522633744856,
+            "baseline_typical": 1.0,
+            "feature": "aead_flag",
+            "value": 0.0
+          }
+        ]
+      },
+      "observed_risk": 90,
+      "packets": {
+        "first": 24,
+        "last": 28
+      },
+      "protocol": "smtp",
+      "protocol_confidence": "high",
+      "tls": {
+        "cert_visibility": "NOT_OBSERVABLE",
+        "cipher": null,
+        "downgrade_delta": 0,
+        "forward_secrecy": false,
+        "group": null,
+        "hybrid_pq_flag": false,
+        "negotiated_version": null,
+        "offered_version": null
+      },
+      "transition": {
+        "confidence_band": "inferred",
+        "evidence": [
+          {
+            "byte_length": 8,
+            "byte_offset": 96,
+            "display": "250 XSNVVQRW",
+            "field": "smtp.capability",
+            "frame": 26
+          },
+          {
+            "byte_length": 37,
+            "byte_offset": 54,
+            "display": "AUTH argument redacted",
+            "field": "cleartext-auth",
+            "frame": 27
+          }
+        ],
+        "verdict": "suspected"
+      }
+    },
+    {
+      "certificate": {
+        "expired": true,
+        "key_bits": 2048,
+        "notAfter": "2026-01-01T00:00:00+00:00",
+        "notBefore": "2025-01-01T00:00:00+00:00",
+        "reason": "expired at capture time",
+        "self_signed": false,
+        "sig_alg": "sha256",
+        "status": "INVALID"
+      },
+      "evidence_coverage": 100,
+      "findings": [
+        {
+          "affected_sessions": [
+            "s5"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 709,
+              "byte_offset": 69,
+              "display": "certificate DER",
+              "field": "tls.certificate",
+              "frame": 31
+            }
+          ],
+          "fix": "Reissue the certificate before its notAfter date and monitor renewal lead time.",
+          "references": [
+            "RFC 5280 Section 4.1.2.5"
+          ],
+          "remediation_effort": "cert_reissue",
+          "remediation_id": "reissue_certificate",
+          "rule_id": "CERT-EXPIRED",
+          "severity": "high",
+          "what": "The certificate was expired at the moment this session was captured.",
+          "why": "A client that accepts an expired certificate loses any assurance the connection is authenticated to a specific server."
+        }
+      ],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40005,
+        "server_ip": "10.0.0.20",
+        "server_port": 993,
+        "transport": "tcp"
+      },
+      "id": "s5",
+      "ml": {
+        "anomaly_percentile": 100.0,
+        "anomaly_score": 13.511560888635072,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": true,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 0.40650406504065045,
+            "baseline_typical": -1.0,
+            "feature": "cert_days_to_expiry_at_capture",
+            "value": -248.0
+          },
+          {
+            "baseline_share_pct": 28.968253968253972,
+            "baseline_typical": -1.0,
+            "feature": "cert_key_bits",
+            "value": 2048.0
+          },
+          {
+            "baseline_share_pct": 29.2,
+            "baseline_typical": 0.0,
+            "feature": "downgrade_delta",
+            "value": 1.0
+          }
+        ]
+      },
+      "observed_risk": 17,
+      "packets": {
+        "first": 29,
+        "last": 33
+      },
+      "protocol": "imap",
+      "protocol_confidence": "medium",
+      "tls": {
+        "cert_visibility": "OBSERVABLE",
+        "cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "downgrade_delta": 1,
+        "forward_secrecy": true,
+        "group": null,
+        "hybrid_pq_flag": false,
+        "negotiated_version": "TLS1.2",
+        "offered_version": "TLS1.3"
+      },
+      "transition": {
+        "confidence_band": "certain",
+        "evidence": [
+          {
+            "byte_length": 5,
+            "byte_offset": 54,
+            "display": "TLS record",
+            "field": "tls.record",
+            "frame": 29
+          }
+        ],
+        "verdict": "upgraded"
+      }
+    },
+    {
+      "certificate": {
+        "expired": null,
+        "key_bits": null,
+        "notAfter": null,
+        "notBefore": null,
+        "reason": "certificate exchanged inside the encrypted TLS 1.3 handshake",
+        "self_signed": null,
+        "sig_alg": null,
+        "status": "NOT_OBSERVABLE"
+      },
+      "evidence_coverage": 75,
+      "findings": [
+        {
+          "affected_sessions": [
+            "s6"
+          ],
+          "confidence": 1.0,
+          "confidence_band": "certain",
+          "evidence": [
+            {
+              "byte_length": 2,
+              "byte_offset": 113,
+              "display": "0x11ec",
+              "field": "tls.server_hello.key_share.group",
+              "frame": 35
+            }
+          ],
+          "fix": "No action needed; this session is already harvest-now-decrypt-later resistant.",
+          "references": [
+            "draft-ietf-tls-hybrid-design"
+          ],
+          "remediation_effort": "one_line_reload",
+          "remediation_id": "none",
+          "rule_id": "PQ-HYBRID-OBSERVED",
+          "severity": "info",
+          "what": "The session negotiated a hybrid post-quantum key exchange (X25519MLKEM768).",
+          "why": "A hybrid PQ key exchange is not retroactively decryptable by a future quantum computer, unlike classical-only (EC)DHE."
+        }
+      ],
+      "five_tuple": {
+        "client_ip": "10.0.0.10",
+        "client_port": 40006,
+        "server_ip": "10.0.0.20",
+        "server_port": 465,
+        "transport": "tcp"
+      },
+      "id": "s6",
+      "ml": {
+        "anomaly_percentile": 90.0,
+        "anomaly_score": 0.5817060950368904,
+        "baseline_sessions": 240,
+        "disagrees_with_rules": false,
+        "is_anomaly": false,
+        "model": "IsolationForest+HBOS",
+        "schema_version": "ml-v1",
+        "top_factors": [
+          {
+            "baseline_share_pct": 10.2880658436214,
+            "baseline_typical": 0.0,
+            "feature": "hybrid_pq_flag",
+            "value": 1.0
+          },
+          {
+            "baseline_share_pct": 42.248062015503876,
+            "baseline_typical": 9.0,
+            "feature": "packet_count",
+            "value": 4.0
+          },
+          {
+            "baseline_share_pct": 44.8559670781893,
+            "baseline_typical": 0.0,
+            "feature": "implicit_tls",
+            "value": 1.0
+          }
+        ]
+      },
+      "observed_risk": 0,
+      "packets": {
+        "first": 34,
+        "last": 37
+      },
+      "protocol": "smtp",
+      "protocol_confidence": "medium",
+      "tls": {
+        "cert_visibility": "NOT_OBSERVABLE",
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "downgrade_delta": 0,
+        "forward_secrecy": true,
+        "group": "X25519MLKEM768",
+        "hybrid_pq_flag": true,
+        "negotiated_version": "TLS1.3",
+        "offered_version": "TLS1.3"
+      },
+      "transition": {
+        "confidence_band": "certain",
+        "evidence": [
+          {
+            "byte_length": 5,
+            "byte_offset": 54,
+            "display": "TLS record",
+            "field": "tls.record",
+            "frame": 34
+          }
+        ],
+        "verdict": "upgraded"
+      }
+    }
+  ],
+  "summary": {
+    "cleartext": 2,
+    "encrypted": 4,
+    "findings_by_severity": {
+      "critical": 4,
+      "high": 4,
+      "info": 1,
+      "medium": 3
+    },
+    "sessions_total": 6
+  }
+}

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SecureMailScope Report - {{ report.capture.filename }}</title>
+<style>
+  :root {
+    /* NETRA tokens from web/css/app.css; system fonts keep this file offline. */
+    --bg-base: #F5F3EE; --bg-panel: #FFFFFF; --bg-border: #1A1A1A;
+    --text: #1A1A1A; --text-muted: #6B6B6B; --highlight: #EDE7C3;
+    --navy: #102A43;
+    --sev-critical: #D9534F; --sev-high: #E8913A; --sev-medium: #E8C547;
+    --sev-low: #5CB85C; --sev-info: #6C8EBF;
+    --radius: 2px; --sp: 8px;
+    --font: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, Menlo, Consolas, monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { font-size: 16px; }
+  body {
+    margin: 0 auto; padding: 32px; max-width: 1600px;
+    background: var(--bg-base); color: var(--text);
+    font-family: var(--font); line-height: 1.5;
+  }
+  h1, h2, h3 { margin: 0 0 8px; font-family: var(--mono); font-weight: 800; }
+  h1 {
+    padding: 20px 24px; margin: 0; background: var(--navy); color: #FFFFFF;
+    border: 1.5px solid #071A2B; font-size: 1.15rem;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  h2 { font-size: 1.5rem; letter-spacing: -.04em; }
+  h3 { font-size: 1.05rem; overflow-wrap: anywhere; }
+  p { margin: 0 0 16px; }
+  section { margin-bottom: 32px; }
+  .muted, .band { color: var(--text-muted); }
+  .muted { font-size: .85rem; }
+  .capture-meta {
+    padding: 16px 24px; margin-bottom: 24px; background: var(--bg-panel);
+    border: 1.5px solid var(--bg-border); border-top: 0;
+    font-family: var(--mono); font-size: .78rem; overflow-wrap: anywhere;
+  }
+  .banner {
+    display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 1.5fr);
+    background: var(--navy); color: #FFFFFF;
+    border: 2px solid var(--bg-border); margin-bottom: 16px;
+  }
+  .banner > div { padding: 16px; align-content: center; }
+  .banner > div + div { border-left: 1px solid rgba(255, 255, 255, .35); font-size: .82rem; }
+  .banner .big { font: 800 2.4rem/1 var(--mono); }
+  .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .card {
+    background: var(--bg-panel); border: 1.5px solid var(--bg-border); border-radius: var(--radius);
+    padding: 20px; min-width: 0; min-height: 150px;
+  }
+  .card .label { font-family: var(--mono); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+  .card .value { font: 800 48px/1 var(--mono); margin-top: 12px; overflow-wrap: anywhere; }
+  .card:nth-child(n+3) { min-height: 110px; }
+  .card:nth-child(n+3) .value { font-size: 1.8rem; }
+  table { width: 100%; border-collapse: collapse; background: var(--bg-panel); border: 1.5px solid var(--bg-border); margin-bottom: 24px; font-size: .82rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #D7D7D7; vertical-align: top; overflow-wrap: anywhere; }
+  th { font-family: var(--mono); font-weight: 800; letter-spacing: .02em; }
+  thead th { border-bottom: 3px solid var(--bg-border); }
+  tbody tr:hover { background: var(--highlight); }
+  .capture-health-passport { border: 2px solid var(--bg-border); background: var(--bg-panel); }
+  .capture-health-passport > h2 { padding: 14px 16px 0; font-size: 1.15rem; }
+  .capture-health-passport > p { padding: 0 16px 14px; margin: 0; }
+  .capture-health-passport table { table-layout: fixed; margin: 0; border: 0; border-top: 1.5px solid var(--bg-border); }
+  .capture-health-passport th, .capture-health-passport td { width: 25%; padding: 14px 16px; border-right: 1px solid var(--bg-border); border-bottom: 1px solid var(--bg-border); }
+  .capture-health-passport th { font-size: .68rem; color: var(--text-muted); text-transform: uppercase; }
+  .capture-health-passport td { font-size: .8rem; font-weight: 700; }
+  .capture-health-passport td:last-child { border-right: 0; }
+  .capture-health-passport tr:last-child > * { border-bottom: 0; }
+  .capture-health-passport.warning { border-color: #9B540E; background: #FFF6E8; }
+  .capture-health-passport.warning table { background: #FFF6E8; }
+  .pill {
+    display: inline-block; padding: 2px 8px; border: 1px solid var(--bg-border);
+    border-radius: var(--radius); font-family: var(--mono); font-size: .72rem;
+    font-weight: 700; color: var(--text); text-transform: uppercase;
+  }
+  .pill.critical { background: var(--sev-critical); }
+  .pill.high { background: var(--sev-high); }
+  .pill.medium { background: var(--sev-medium); }
+  .pill.low { background: var(--sev-low); }
+  .pill.info { background: var(--sev-info); }
+  .band { font-size: .72rem; }
+  details { margin: 4px 0; }
+  details > summary { cursor: pointer; color: var(--text); font-family: var(--mono); font-size: .82rem; padding: 6px 0; }
+  details > summary:hover { background: var(--highlight); }
+  :focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  .finding { background: var(--bg-panel); border: 1.5px solid var(--bg-border); border-radius: var(--radius); padding: 16px; margin: 12px 0; }
+  .finding.critical { border-left: 5px solid var(--sev-critical); }
+  .finding.high { border-left: 5px solid var(--sev-high); }
+  .finding.medium { border-left: 5px solid var(--sev-medium); }
+  .finding.low { border-left: 5px solid var(--sev-low); }
+  .finding.info { border-left: 5px solid var(--sev-info); }
+  .finding .head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .finding .rule-id { font: 800 .78rem var(--mono); }
+  .finding .row { margin: 6px 0; font-size: .85rem; }
+  .finding .row > strong { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+  .evidence { font-family: var(--mono); color: var(--text-muted); overflow-wrap: anywhere; }
+  .server-card {
+    background: var(--bg-panel); border: 1.5px solid var(--bg-border); border-radius: var(--radius);
+    margin: 16px 0;
+  }
+  .server-card h3 { padding: 14px 16px 0; }
+  .server-meta { color: var(--text-muted); font-size: .76rem; padding: 0 16px 14px; }
+  .server-card table { margin: 0; border: 0; border-top: 1.5px solid var(--bg-border); font-size: .8rem; }
+  .server-card > div:last-child:not(.server-meta) { padding: 12px 16px; }
+  .support-state, .tier-badge { display: inline-block; border: 1px solid var(--bg-border); padding: 2px 5px; font-family: var(--mono); font-size: .68rem; font-weight: 800; }
+  .state-demonstrated, .tier-observed { background: #98D8AA; }
+  .state-excluded_firm, .tier-deduced { background: #A9C8F5; }
+  .tier-inferred { background: #F3CE72; }
+  .state-contradicted { background: #F18B82; }
+  .state-undetermined, .tier-not_observable { background: #D7D7D7; }
+  .tier-not_observable { border-style: dashed; }
+  .caveat {
+    background: var(--highlight); border: 1.5px solid var(--bg-border);
+    padding: 12px 16px; font-size: .82rem;
+  }
+  .caveat p:last-child { margin-bottom: 0; }
+  @media (max-width: 800px) {
+    body { padding: 16px; }
+    .banner { grid-template-columns: 1fr; }
+    .banner > div + div { border-left: 0; border-top: 1px solid rgba(255,255,255,.35); }
+    th, td { padding: 6px; }
+    .capture-health-passport th, .capture-health-passport td { padding: 8px; }
+  }
+  @page {
+    size: A4;
+    margin: 14mm 12mm 16mm;
+    @bottom-left { content: "SecureMailScope\A© 2026 Krishna Chaittanyah Dummani and Team Grey Hats · MIT Licence · netra-framework.tech"; white-space: pre; color: #6B6B6B; font-family: var(--mono); font-size: 8pt; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); color: #6B6B6B; font-family: var(--mono); font-size: 8pt; }
+  }
+  @media print {
+    html { font-size: 12px; }
+    body { padding: 0; font-size: 9pt; line-height: 1.35; }
+    section { margin-bottom: 16px; }
+    table { font-size: 8pt; margin-bottom: 12px; }
+    th, td { padding: 4px 5px; }
+    thead { display: table-header-group; }
+    tr, .server-card, .finding, .caveat { break-inside: avoid; }
+    .server-card { padding: 8px 10px; }
+    .finding { padding: 7px 9px; margin: 5px 0; }
+    .banner, .card { break-inside: avoid; }
+    tr:hover td { background: transparent; }
+    .supplemental { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<h1>SecureMailScope</h1>
+<div class="capture-meta">
+  {{ report.capture.filename }} &middot; sha256 {{ report.capture.sha256 }} &middot;
+  {{ report.capture.packets }} packets &middot; registry {{ report.registry_version }} &middot;
+  {{ report.capture.first_ts }} &rarr; {{ report.capture.last_ts }}
+</div>
+
+<section class="capture-health-passport{% if report.capture_health.analysis_status != 'complete' or report.capture_health.truncated %} warning{% endif %}">
+<h2>Capture health passport</h2>
+<p class="muted">What the passive ingest could and could not analyse.</p>
+<table>
+  <tbody>
+    <tr><th scope="row">File format</th><td>{{ report.capture_health.file_format }}</td>
+        <th scope="row">Link types seen</th><td>{% for linktype, count in report.capture_health.linktypes|dictsort %}{{ linktype }} ({{ count }} frame{% if count != 1 %}s{% endif %}){% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</td></tr>
+    <tr><th scope="row">Snaplen / truncated</th><td>{{ report.capture_health.snaplen }} / {{ "yes" if report.capture_health.truncated else "no" }}</td>
+        <th scope="row">Frames decoded</th><td>{{ report.capture_health.frames_decoded_pct }}% ({{ report.capture_health.analysis_status }})</td></tr>
+    <tr><th scope="row">Total frames</th><td>{{ report.capture_health.frames }}</td>
+        <th scope="row">TCP segments</th><td>{{ report.capture_health.tcp_segments }}</td></tr>
+    <tr><th scope="row">Flows (total / candidates)</th><td>{{ report.capture_health.total_flows }} / {{ report.capture_health.candidate_flows }}</td>
+        <th scope="row">Confirmed mail sessions</th><td>{{ report.capture_health.confirmed_mail_sessions }}</td></tr>
+    <tr><th scope="row">IPv4 / IPv6</th><td>{{ report.capture_health.ipv4 }} / {{ report.capture_health.ipv6 }}</td>
+        <th scope="row">IPv4 fragments</th><td>{{ report.capture_health.ipv4_fragments }}</td></tr>
+    <tr><th scope="row">Frames skipped by reason</th><td>{% for reason, count in report.capture_health.skipped|dictsort %}{{ reason }}: {{ count }}{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</td>
+        <th scope="row">Padding bytes trimmed</th><td>{{ report.capture_health.padding_bytes_trimmed }}</td></tr>
+    <tr><th scope="row">Flows evicted / truncated</th><td>{{ report.capture_health.flows_evicted }} / {{ report.capture_health.flows_truncated }}</td>
+        <th scope="row">Sessions with holes</th><td>{{ report.capture_health.sessions_with_holes }}</td></tr>
+    <tr><th scope="row">Sessions with conflicting overlaps</th><td>{{ report.capture_health.sessions_with_conflicting_overlaps }}</td>
+        <th scope="row">Sessions marked incomplete</th><td>{{ report.capture_health.sessions_incomplete }}</td></tr>
+    <tr><th scope="row">Mid-stream sessions</th><td>{% for session, midstream in report.capture_health.midstream_sessions|dictsort %}{{ session }}: {{ "yes" if midstream else "no" }}{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</td>
+        <th scope="row">Unsupported packets</th><td>{{ report.capture_health.unsupported_packets["count"] }} ({% for reason, count in report.capture_health.unsupported_packets.breakdown|dictsort %}{{ reason }}: {{ count }}{% if not loop.last %}, {% endif %}{% endfor %})</td></tr>
+  </tbody>
+</table>
+</section>
+
+<section id="servers">
+<h2>Servers and support matrices</h2>
+<p class="muted">Capabilities are grouped by endpoint plus observed SNI or SMTP banner identity. Unknowns remain unknown.</p>
+{% for server in report.servers %}
+<article class="server-card">
+  <h3>{{ server.server_id }}</h3>
+  <div class="server-meta">
+    Sessions: {{ server.sessions|join(", ") }} &middot;
+    preference mode: {{ server.preference_mode }} &middot;
+    deduced version coverage: {{ server.deduced_coverage.percent }}%
+    ({{ server.deduced_coverage.settled }}/{{ server.deduced_coverage.applicable }})
+  </div>
+  <table class="support-matrix">
+    <thead>
+      <tr><th>Capability</th><th>State</th><th>Tier</th><th>Positive evidence</th><th>Negative evidence</th><th>Establishing frames</th></tr>
+    </thead>
+    <tbody>
+      {% for capability, cell in server.support_matrix|dictsort %}
+      <tr>
+        <td>{{ capability }}</td>
+        <td><span class="support-state state-{{ cell.state|lower }}">{{ cell.state }}</span></td>
+        <td><span class="tier-badge tier-{{ cell.tier|lower }}">{{ cell.tier }}</span></td>
+        <td>{{ cell.positive_evidence|join(", ") if cell.positive_evidence else "none" }}</td>
+        <td>{{ cell.negative_evidence|join(", ") if cell.negative_evidence else "none" }}</td>
+        <td>{% for evidence in cell.establishing_evidence %}{{ evidence.session }} frame {{ evidence.frame }} @{{ evidence.byte_offset }}{% if not loop.last %}; {% endif %}{% else %}none{% endfor %}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="muted">No TLS capability was observable for this identity.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if server.contradictions %}
+  <div><strong>Contradictions:</strong>
+    {% for contradiction in server.contradictions %}
+      {{ contradiction.capability }} (demonstrated {{ contradiction.demonstrated_in|join(", ") }}; excluded {{ contradiction.excluded_in|join(", ") }}){% if not loop.last %}; {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</article>
+{% else %}
+<p class="muted">No server identities were available for correlation.</p>
+{% endfor %}
+</section>
+
+<section id="findings">
+<h2>Findings and evidence</h2>
+<p class="muted">Every finding retains its epistemic tier and exact captured-frame references.</p>
+{% for f in report.findings %}
+<article class="finding report-finding {{ f.severity }}">
+  <div class="head">
+    <span class="pill {{ f.severity }}">{{ f.severity }}</span>
+    <span class="rule-id">{{ f.rule_id }}</span>
+    <span class="band">tier {{ f.tier }} &middot; {{ f.confidence_band }} &middot; confidence {{ f.confidence }}</span>
+  </div>
+  <div class="row"><strong>Sessions:</strong> {{ f.affected_sessions|join(", ") }}</div>
+  <div class="row"><strong>What:</strong> {{ f.what }}</div>
+  <div class="row"><strong>Why:</strong> {{ f.why }}</div>
+  <div class="row"><strong>Fix:</strong> {{ f.fix }} <span class="band">({{ f.remediation_effort }})</span></div>
+  <div class="row evidence">
+    <strong>Evidence:</strong>
+    {% for e in f.evidence %}frame {{ e.frame }} [{{ e.field }} @{{ e.byte_offset }}+{{ e.byte_length }}] = {{ e.display }}{% if not loop.last %}; {% endif %}{% else %}no packet evidence available{% endfor %}
+  </div>
+  {% if f.references %}<div class="row band">References: {{ f.references|join(", ") }}</div>{% endif %}
+</article>
+{% else %}
+  {% if report.summary.findings_assessed %}
+  <p class="muted">No findings.</p>
+  {% else %}
+  <p class="muted">Findings were not assessed because the capture format was unsupported or unreadable.</p>
+  {% endif %}
+{% endfor %}
+</section>
+
+<section id="evidence-coverage-caveat">
+<h2>Evidence coverage caveat</h2>
+<div class="caveat">
+  <p><strong>Risk and coverage are separate.</strong> Missing, encrypted, or otherwise unobservable evidence lowers evidence coverage; it never lowers observed risk or counts as proof of safety.</p>
+  <p>This passive report makes no active DNS, OCSP, CRL, or server queries. Conclusions are limited to captured bytes. DEDUCED facts follow deterministic evidence-preserving logic; INFERRED facts do not become observed inventory.</p>
+</div>
+</section>
+
+<div class="banner supplemental">
+  <div class="big">{{ report.hndl.percent }}%</div>
+  <div>{{ report.hndl.exposed_sessions }} exposed, {{ report.hndl.quantum_safe_sessions }} quantum-safe, and {{ report.hndl.unobservable_sessions_excluded }} unobservable sessions excluded.</div>
+</div>
+
+<div class="cards supplemental">
+  <div class="card">
+    <div class="label">Observed risk</div>
+    <div class="value">{{ report.observed_risk }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Evidence coverage</div>
+    <div class="value">{{ report.evidence_coverage }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Deduced coverage</div>
+    <div class="value">{{ report.deduced_coverage }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Inferred coverage</div>
+    <div class="value">{{ report.inferred_coverage }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Sessions (encrypted / cleartext / not observable)</div>
+    <div class="value">{{ report.summary.encrypted }} / {{ report.summary.cleartext }} / {{ report.summary.not_observable }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Protocols</div>
+    <div class="value" style="font-size:16px;">
+      {% for proto, count in overview.protocol_counts.items() %}{{ proto }}:{{ count }} {% endfor %}
+    </div>
+  </div>
+</div>
+
+<section class="supplemental">
+<h2>Sessions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th><th>Protocol</th><th>Transition</th><th>TLS</th><th>Certificate</th>
+      <th>Risk</th><th>Observed</th><th>Deduced</th><th>Inferred</th><th>Findings</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in report.sessions %}
+    <tr>
+      <td>{{ s.id }}<div class="band">{{ s.five_tuple.server_ip }}:{{ s.five_tuple.server_port }}</div></td>
+      <td>{{ s.protocol }}<div class="band">{{ s.protocol_confidence }}</div></td>
+      <td>{{ s.transition.verdict }}<div class="band">{{ s.transition.confidence_band }}</div></td>
+      <td>
+        {{ s.tls.offered_version or "-" }} -&gt; {{ s.tls.negotiated_version or "-" }}
+        <div class="band">delta {{ s.tls.downgrade_delta if s.tls.downgrade_delta is not none else "-" }}
+          {% if s.tls.hybrid_pq_flag %}&middot; hybrid PQ{% endif %}
+          {% if s.tls.forward_secrecy_status == "NO" %}&middot; no FS{% elif s.tls.negotiated_version and s.tls.forward_secrecy_status != "YES" %}&middot; FS unknown{% endif %}</div>
+      </td>
+      <td>{{ s.certificate.status }}<div class="band">{{ s.certificate.reason or "" }}</div></td>
+      <td>{{ s.observed_risk }}</td>
+      <td>{{ s.evidence_coverage }}</td>
+      <td>{{ s.deduced_coverage }}</td>
+      <td>{{ s.inferred_coverage }}</td>
+      <td>
+        {% if s.findings %}
+        <details>
+          <summary>{{ s.findings|length }} finding(s)</summary>
+          {% for f in s.findings %}
+          <div class="finding {{ f.severity }}">
+            <div class="head">
+              <span class="pill {{ f.severity }}">{{ f.severity }}</span>
+              <span class="rule-id">{{ f.rule_id }}</span>
+              <span class="band">{{ f.tier }} &middot; {{ f.confidence_band }} &middot; confidence {{ f.confidence }}</span>
+            </div>
+            <div class="row"><strong>What:</strong> {{ f.what }}</div>
+            <div class="row"><strong>Why:</strong> {{ f.why }}</div>
+            <div class="row"><strong>Fix:</strong> {{ f.fix }} <span class="band">({{ f.remediation_effort }})</span></div>
+            {% if f.evidence %}
+            <div class="row evidence">
+              {% for e in f.evidence %}frame {{ e.frame }} [{{ e.field }} @{{ e.byte_offset }}+{{ e.byte_length }}] = {{ e.display }}{% if not loop.last %}; {% endif %}{% endfor %}
+            </div>
+            {% endif %}
+            {% if f.references %}<div class="row band">{{ f.references|join(", ") }}</div>{% endif %}
+          </div>
+          {% endfor %}
+        </details>
+        {% else %}
+        <span class="muted">none</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</section>
+
+<section class="supplemental">
+<h2>Remediation priorities</h2>
+<p class="muted">All findings across the capture, sorted by remediation effort: configuration change, certificate reissue, software upgrade.</p>
+<table>
+  <thead>
+    <tr><th>Effort</th><th>Rule</th><th>Severity</th><th>Sessions</th><th>Fix</th></tr>
+  </thead>
+  <tbody>
+    {% for f in findings_by_effort %}
+    <tr>
+      <td>{{ f.remediation_effort }}</td>
+      <td>{{ f.rule_id }}</td>
+      <td><span class="pill {{ f.severity }}">{{ f.severity }}</span></td>
+      <td>{{ f.affected_sessions|join(", ") }}</td>
+      <td>{{ f.fix }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</section>
+
+<section class="supplemental">
+<h2>AI review queue (unusual ≠ malicious)</h2>
+{% if report.ml_summary.enabled %}
+<p>{{ report.ml_summary.anomalies }} unusual sessions; {{ report.ml_summary.abstentions|default(0) }} abstentions; trained on {{ report.ml_summary.baseline_sessions }} baseline sessions. Rules and risk scores are independent.</p>
+{% for s in report.sessions if s.ml and s.ml.is_anomaly %}
+<details><summary>{{ s.id }} - percentile {{ "%.1f"|format(s.ml.anomaly_percentile) }}{% if s.ml.disagrees_with_rules %}; rules/AI disagreement{% endif %}</summary>
+<ul>{% for f in s.ml.top_factors %}<li>{{ f.feature }}: {{ f.value }} (baseline typical {{ f.baseline_typical }}; share {{ "%.1f"|format(f.baseline_share_pct) }}%)</li>{% endfor %}</ul>
+{% if not s.ml.top_factors %}<p>{{ s.ml.explanation }}</p>{% endif %}
+</details>
+{% endfor %}
+{% for s in report.sessions if s.ml and s.ml.abstained %}<p>{{ s.id }}: detector abstained ({{ s.ml.abstention_reason }}).</p>{% endfor %}
+{% else %}<p>AI disabled or baseline unavailable.</p>{% endif %}
+</section>
+<footer class="band supplemental">NETRA · Passive cryptographic posture assessment for email infrastructure<br>© 2026 Krishna Chaittanyah Dummani and Team Grey Hats · MIT Licence · netra-framework.tech</footer>
+</body>
+</html>

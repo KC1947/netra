@@ -1,0 +1,10 @@
+rule_id: CERT-SELF-SIGNED
+severity: medium
+confidence_band: certain
+confidence: 1.0
+what: "The certificate is self-signed (issuer equals subject)."
+why: "A self-signed certificate has no third-party chain of trust, so any client that accepts it is trusting the server's own claim about its identity."
+fix: "Issue a certificate from a trusted internal or public CA."
+remediation_id: reissue_certificate
+remediation_effort: cert_reissue
+references: ["RFC 5280 Section 4.1.2.4"]

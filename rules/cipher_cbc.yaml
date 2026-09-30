@@ -1,0 +1,10 @@
+rule_id: CIPHER-CBC
+severity: medium
+confidence_band: certain
+confidence: 1.0
+what: "The negotiated cipher suite uses CBC-mode encryption."
+why: "CBC-mode TLS cipher suites have a history of padding-oracle and timing attacks (Lucky13, POODLE-adjacent issues)."
+fix: "Reorder the server's cipher preference to prefer AEAD suites (GCM/ChaCha20-Poly1305) ahead of CBC suites."
+remediation_id: prefer_aead_ciphers
+remediation_effort: one_line_reload
+references: ["RFC 9325 Section 4.2"]

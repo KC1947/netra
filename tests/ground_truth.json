@@ -1,0 +1,48 @@
+{
+  "_note": "Self-test oracle. Fix the ENGINE to match this, never edit this to match the engine.",
+  "capture": {
+    "hndl_percent_expected": 83,
+    "_hndl_note": "5 of 6 sessions have no hybrid-PQ key exchange (s6 is the only PQ session)."
+  },
+  "sessions": [
+    {
+      "id": "s1", "protocol": "smtp", "transition_verdict": "upgraded",
+      "offered_version": "TLS1.3", "negotiated_version": "TLS1.3", "downgrade_delta": 0,
+      "forward_secrecy": true, "hybrid_pq_flag": false, "cert_status": "NOT_OBSERVABLE",
+      "expected_rule_ids": [], "risk_band": "low"
+    },
+    {
+      "id": "s2", "protocol": "smtp", "transition_verdict": "upgraded",
+      "offered_version": "TLS1.3", "negotiated_version": "TLS1.0", "downgrade_delta": 3,
+      "forward_secrecy": false, "hybrid_pq_flag": false, "cert_status": "INVALID",
+      "expected_rule_ids": ["TLS-VER-DEPRECATED","DOWNGRADE-DELTA","CIPHER-CBC","KEX-NO-FS","CERT-SELF-SIGNED","CERT-WEAK-KEY"],
+      "_note": "CERT-SHA1-SIG omitted: cryptography rejects SHA-1 certificate signing; the fixture uses SHA-256.",
+      "risk_band": "high"
+    },
+    {
+      "id": "s3", "protocol": "smtp", "transition_verdict": "not_used",
+      "offered_version": null, "negotiated_version": null, "downgrade_delta": null,
+      "forward_secrecy": null, "hybrid_pq_flag": false, "cert_status": "NOT_OBSERVABLE",
+      "expected_rule_ids": ["STARTTLS-NOT-OFFERED","CLEARTEXT-AUTH"], "risk_band": "critical"
+    },
+    {
+      "id": "s4", "protocol": "smtp", "transition_verdict": "suspected",
+      "offered_version": null, "negotiated_version": null, "downgrade_delta": null,
+      "_note": "No ClientHello exists in this session's packets -- the client never attempted TLS after seeing the mangled capability. offered_version/downgrade_delta must be null per the no-invented-facts rule, NOT inferred from the strip suspicion.",
+      "forward_secrecy": null, "hybrid_pq_flag": false, "cert_status": "NOT_OBSERVABLE",
+      "expected_rule_ids": ["STARTTLS-STRIP-SUSPECTED","CLEARTEXT-AUTH"], "risk_band": "critical"
+    },
+    {
+      "id": "s5", "protocol": "imap", "transition_verdict": "upgraded",
+      "offered_version": "TLS1.3", "negotiated_version": "TLS1.2", "downgrade_delta": 1,
+      "forward_secrecy": true, "hybrid_pq_flag": false, "cert_status": "INVALID",
+      "expected_rule_ids": ["CERT-EXPIRED"], "risk_band": "medium"
+    },
+    {
+      "id": "s6", "protocol": "smtp", "transition_verdict": "upgraded",
+      "offered_version": "TLS1.3", "negotiated_version": "TLS1.3", "downgrade_delta": 0,
+      "forward_secrecy": true, "hybrid_pq_flag": true, "cert_status": "NOT_OBSERVABLE",
+      "expected_rule_ids": ["PQ-HYBRID-OBSERVED"], "risk_band": "low"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "captures": [
+    {
+      "candidate_flows": 6,
+      "confirmed_mail_sessions": 6,
+      "confirmed_mail_sessions_basis": "sessions whose mail protocol is confirmed by payload grammar (session.protocol != 'unknown')",
+      "elapsed_seconds_median": 0.013994,
+      "mail_sessions_found": 6,
+      "mail_sessions_found_basis": "sessions retained for analysis: payload-grammar-confirmed mail sessions plus protocol-indeterminate sessions on known mail-service ports",
+      "mb_per_second": 0.381,
+      "packets": 37,
+      "packets_per_second": 2644.038,
+      "path": "out/sample.pcap",
+      "peak_memory_bytes": 143720448,
+      "sha256": "09a0cbf64f3b8a8ea91d5a7a9ca6f87d1fe9003c71fa34b720200d61da321f26",
+      "size_bytes": 5335,
+      "total_flows": 6
+    },
+    {
+      "candidate_flows": 18,
+      "confirmed_mail_sessions": 15,
+      "confirmed_mail_sessions_basis": "sessions whose mail protocol is confirmed by payload grammar (session.protocol != 'unknown')",
+      "elapsed_seconds_median": 0.024841,
+      "mail_sessions_found": 18,
+      "mail_sessions_found_basis": "sessions retained for analysis: payload-grammar-confirmed mail sessions plus protocol-indeterminate sessions on known mail-service ports",
+      "mb_per_second": 0.471,
+      "packets": 69,
+      "packets_per_second": 2777.61,
+      "path": "out/multiclient.pcap",
+      "peak_memory_bytes": 143982592,
+      "sha256": "b69be23b188b9ad11b78d01131f621bb7cf1df320766a9c118522b4a2a5eb6f8",
+      "size_bytes": 11697,
+      "total_flows": 18
+    },
+    {
+      "candidate_flows": 37,
+      "confirmed_mail_sessions": 29,
+      "confirmed_mail_sessions_basis": "sessions whose mail protocol is confirmed by payload grammar (session.protocol != 'unknown')",
+      "elapsed_seconds_median": 0.508313,
+      "mail_sessions_found": 37,
+      "mail_sessions_found_basis": "sessions retained for analysis: payload-grammar-confirmed mail sessions plus protocol-indeterminate sessions on known mail-service ports",
+      "mb_per_second": 0.568,
+      "packets": 1323,
+      "packets_per_second": 2602.727,
+      "path": "tests/fixtures/real_mail.pcap",
+      "peak_memory_bytes": 149422080,
+      "sha256": "5dae831e40f07b1cbbd55d6aec947644c474ddf5f9964a52e32c853b2d6ac3c4",
+      "size_bytes": 288532,
+      "total_flows": 37
+    },
+    {
+      "candidate_flows": 24,
+      "confirmed_mail_sessions": 21,
+      "confirmed_mail_sessions_basis": "sessions whose mail protocol is confirmed by payload grammar (session.protocol != 'unknown')",
+      "elapsed_seconds_median": 3.586936,
+      "mail_sessions_found": 24,
+      "mail_sessions_found_basis": "sessions retained for analysis: payload-grammar-confirmed mail sessions plus protocol-indeterminate sessions on known mail-service ports",
+      "mb_per_second": 1.561,
+      "packets": 60106,
+      "packets_per_second": 16756.919,
+      "path": "out/haystack.pcap",
+      "peak_memory_bytes": 174653440,
+      "sha256": "b887086be3c168577f459475dcf8539e708c61dae0f1006cce4f6be12017c68c",
+      "size_bytes": 5600898,
+      "total_flows": 5024
+    }
+  ],
+  "cpu_count": 10,
+  "git_commit": "d319de9fff3072f5835079e52cf412dcf7571ccc",
+  "git_dirty": false,
+  "haystack_accuracy": {
+    "false_negatives": 0,
+    "false_positives": 0,
+    "injected_mail_sessions": 24,
+    "injected_mail_sessions_basis": "mail sessions injected from the two deterministic needle captures, counted by canonical TCP endpoint pair",
+    "measurement_basis": "exact canonical TCP endpoint-pair intersection over retained mail sessions; payload-grammar confirmation is not required",
+    "precision": 1.0,
+    "recall": 1.0,
+    "recall_basis": "true_positives / injected_mail_sessions",
+    "true_positives": 24,
+    "true_positives_basis": "injected canonical TCP endpoint pairs present among retained mail sessions, including protocol-indeterminate sessions on known mail-service ports",
+    "truth_file": "out/haystack.truth.json"
+  },
+  "method": {
+    "elapsed_statistic": "median",
+    "megabyte_definition": 1000000,
+    "ml_enabled": false,
+    "peak_memory_statistic": "maximum process RSS across the three isolated runs",
+    "runs_per_capture": 3
+  },
+  "python_version": "3.12.14",
+  "schema_version": 1
+}

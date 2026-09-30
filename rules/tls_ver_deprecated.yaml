@@ -1,0 +1,10 @@
+rule_id: TLS-VER-DEPRECATED
+severity: high
+confidence_band: certain
+confidence: 1.0
+what: "Negotiated TLS version is deprecated (SSL3.0/TLS1.0/TLS1.1)."
+why: "TLS 1.0 and 1.1 lack modern AEAD ciphers and secure hash negotiation, and both are formally deprecated by RFC 8996."
+fix: "Disable TLS versions below 1.2 on this service and require TLS 1.2 or 1.3."
+remediation_id: disable_legacy_tls
+remediation_effort: software_upgrade
+references: ["RFC 8996", "RFC 9325"]

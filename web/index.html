@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NETRA — Passive cryptographic posture assessment</title>
+  <link rel="icon" type="image/svg+xml" href="assets/netra-mark.svg">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="vendor/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header" id="app-header">
+    <div class="header-left">
+      <div class="header-logo" aria-label="NETRA">
+        <svg class="netra-mark" width="32" height="32" viewBox="0 0 256 256" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linejoin="miter" stroke-miterlimit="6">
+            <path d="M128 21 L38.5 61.5 L38.5 120 C40 165 62 205 128 235 C194 205 216 165 217.5 120 L217.5 61.5 Z" stroke-width="10"/>
+            <path d="M45 129.5 Q128 39.5 211 129.5 Q128 219.5 45 129.5 Z" stroke-width="9.5"/>
+            <circle cx="128" cy="129.5" r="46.2" stroke-width="9.5"/>
+          </g>
+          <path fill="currentColor" d="M128 108.8a11.2 11.2 0 0 0-6.5 20.3L118.3 152.8h19.4l-3.2-23.7A11.2 11.2 0 0 0 128 108.8Z"/>
+        </svg>
+        <div class="wordmark-copy">
+          <h1 class="header-title">NETRA</h1>
+          <p class="header-subtitle">Passive cryptographic posture assessment for email infrastructure</p>
+        </div>
+      </div>
+      <div class="header-pills">
+        <span class="pill pill-passive">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+          Passive
+        </span>
+        <span class="pill pill-offline">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/></svg>
+          Offline
+        </span>
+        <span class="pill pill-engine" id="engine-pill">
+          <span class="engine-dot" id="engine-dot"></span>
+          <span id="engine-label">Checking…</span>
+        </span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-exports" aria-label="Report exports">
+        <a class="btn btn-header-export disabled" id="header-export-cbom-btn" aria-disabled="true" tabindex="-1" title="Export unavailable until an analysis report is loaded.">CBOM (CycloneDX 1.6)</a>
+        <a class="btn btn-header-export disabled" id="header-export-pdf-btn" aria-disabled="true" tabindex="-1" title="Export unavailable until an analysis report is loaded.">PDF report</a>
+      </div>
+      <label class="ai-toggle" id="ai-toggle">
+        <span class="ai-toggle-label">AI Layer</span>
+        <input type="checkbox" id="ai-checkbox" aria-label="AI Layer" checked>
+        <span class="ai-toggle-slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <!-- Layout wrapper -->
+  <div class="app-layout" id="app-layout">
+    <!-- Left nav -->
+    <nav class="side-nav" id="side-nav" role="navigation" aria-label="Main navigation">
+      <a href="#library" class="nav-item active" data-section="library">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Library
+      </a>
+      <a href="#analysis" class="nav-item" data-section="analysis">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analysis
+      </a>
+      <a href="#overview" class="nav-item" data-section="overview">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a href="#sessions" class="nav-item" data-section="sessions">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Sessions
+      </a>
+      <a href="#fixfirst" class="nav-item" data-section="fixfirst">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Fix-first
+      </a>
+      <a href="#aiqueue" class="nav-item" data-section="aiqueue">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.1-.9 2-2 2h-4a2 2 0 0 1-2-2 4 4 0 0 1 4-4z"/><path d="M8 8v8a4 4 0 0 0 8 0V8"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
+        AI queue
+      </a>
+      <a href="#roadmap" class="nav-item" data-section="roadmap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Roadmap
+      </a>
+      <hr class="nav-sep">
+      <a class="nav-item" href="/guide" onclick="window.location.href='/guide'; return false;">How to Use NETRA?</a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content" id="main-content">
+      <p id="app-status" class="ai-isolation-note" role="status" hidden></p>
+
+      <!-- Section: Library -->
+      <section id="library" class="section section-active">
+        <div class="section-header">
+          <h2>Capture Library</h2>
+          <p class="section-subtitle">Local .pcap and .pcapng captures.</p>
+        </div>
+        <div id="upload-zone-container">
+          <!-- Upload zone populated by js/views/library.js -->
+        </div>
+        <div class="capture-library-sections" id="capture-grid">
+          <!-- Cards populated by js/views/library.js -->
+          <div class="loading-indicator" id="library-loading">
+            <div class="spinner"></div>
+            <span>Loading captures…</span>
+          </div>
+        </div>
+        <div class="library-actions" id="library-actions" hidden>
+          <button class="btn btn-primary btn-large" id="analyse-btn" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="analyse-btn-text">Select a capture</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section: Analysis Pipeline -->
+      <section id="analysis" class="section">
+        <div class="section-header">
+          <h2>Analysis Pipeline</h2>
+          <p class="section-subtitle" id="analysis-subtitle">Passive protocol analysis and cross-session correlation.</p>
+        </div>
+        <div class="pipeline-container" id="pipeline-container" hidden>
+          <div class="stepper" id="stepper">
+            <!-- Steps M1-M9 populated by js/views/analysis.js -->
+          </div>
+          <div class="pipeline-log-container">
+            <h3 class="pipeline-log-title">Live Log</h3>
+            <div class="pipeline-log" id="pipeline-log"></div>
+          </div>
+        </div>
+        <div class="pipeline-empty" id="pipeline-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8FA3B8" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <p>No capture selected for analysis.</p>
+        </div>
+        <div class="pipeline-error" id="pipeline-error" hidden>
+          <p id="pipeline-error-msg"></p>
+          <button class="btn btn-primary" id="pipeline-retry-btn">Retry Analysis</button>
+        </div>
+      </section>
+
+      <!-- Section: Overview -->
+      <section id="overview" class="section">
+        <div class="section-header overview-header">
+          <h2>Overview</h2>
+          <div class="export-buttons overview-export-actions" id="overview-export-actions" hidden>
+            <a class="btn btn-secondary" id="overview-export-json-btn" download>
+              Export JSON
+            </a>
+            <a class="btn btn-secondary" id="overview-export-html-btn" download>
+              Export HTML
+            </a>
+            <a class="btn btn-secondary" id="overview-export-cbom-btn" download>
+              Export CBOM
+            </a>
+            <a class="btn btn-secondary" id="overview-export-pdf-btn" download>
+              Export PDF
+            </a>
+          </div>
+        </div>
+        <div class="overview-empty" id="overview-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8FA3B8" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <p>No analysis report loaded.</p>
+        </div>
+        <div id="overview-content" hidden>
+          <!-- Transparency strip -->
+          <div class="transparency-strip" id="transparency-strip"></div>
+
+          <!-- Capture health always precedes risk findings and metrics -->
+          <div id="capture-health-passport"></div>
+
+          <!-- Report-level score cards; missing report fields remain visibly empty -->
+          <div class="kpi-grid" id="kpi-grid"></div>
+
+          <p class="kpi-explanation">Observed risk measures identified transport weaknesses. Evidence coverage measures the available capture evidence. Missing evidence never counts as safe.</p>
+          <div id="hndl-banner"></div>
+
+          <!-- Charts -->
+          <div class="charts-grid" id="charts-grid">
+            <div class="chart-panel">
+              <h3>Findings by Severity</h3>
+              <div class="chart-container"><canvas id="chart-severity"></canvas></div>
+            </div>
+            <div class="chart-panel">
+              <h3>TLS Versions</h3>
+              <div class="chart-container"><canvas id="chart-tls"></canvas></div>
+            </div>
+            <div class="chart-panel">
+              <h3>Transition Verdicts</h3>
+              <div class="chart-container"><canvas id="chart-verdicts"></canvas></div>
+            </div>
+          </div>
+
+          <div class="support-matrices" id="support-matrices"></div>
+        </div>
+      </section>
+
+      <!-- Section: Sessions -->
+      <section id="sessions" class="section">
+        <div class="section-header">
+          <h2>Sessions</h2>
+        </div>
+        <div class="sessions-empty" id="sessions-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8FA3B8" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+          <p>No session report loaded.</p>
+        </div>
+        <div id="sessions-content" hidden>
+          <div class="sessions-filters" id="sessions-filters"></div>
+          <div class="sessions-table-wrap">
+            <table class="sessions-table" id="sessions-table">
+              <thead>
+                <tr>
+                  <th data-sort="id">ID</th>
+                  <th data-sort="protocol">Protocol</th>
+                  <th data-sort="endpoints">Client → Server</th>
+                  <th data-sort="verdict">Verdict</th>
+                  <th data-sort="tls">TLS Version</th>
+                  <th data-sort="downgrade">Δ Down</th>
+                  <th data-sort="cert">Certificate</th>
+                  <th data-sort="risk">Risk</th>
+                  <th data-sort="coverage">Coverage</th>
+                  <th data-sort="ai">AI %ile</th>
+                </tr>
+              </thead>
+              <tbody id="sessions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Fix-first -->
+      <section id="fixfirst" class="section">
+        <div class="section-header">
+          <h2>Fix-first Priorities</h2>
+          <p class="section-subtitle">All non-info findings sorted by severity and remediation effort.</p>
+        </div>
+        <div class="fixfirst-empty" id="fixfirst-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8FA3B8" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <p>No findings report loaded.</p>
+        </div>
+        <div id="fixfirst-content" hidden></div>
+      </section>
+
+      <!-- Section: AI Queue -->
+      <section id="aiqueue" class="section">
+        <div class="section-header">
+          <h2>Rules ∥ AI Disagreement</h2>
+          <p class="section-subtitle">Sessions marked anomalous by the engine with no medium, high, or critical rule finding.</p>
+        </div>
+        <div id="aiqueue-content"></div>
+      </section>
+
+      <!-- Section: Roadmap -->
+      <section id="roadmap" class="section">
+        <div class="section-header">
+          <h2>Roadmap</h2>
+          <p class="section-subtitle">Further planned capabilities — not yet available.</p>
+        </div>
+        <div class="roadmap-grid" id="roadmap-grid">
+          <div class="roadmap-card" aria-disabled="true">
+            <span class="roadmap-badge">Planned</span>
+            <h3>Posture Trend View</h3>
+            <p>Cryptographic posture changes across repeated analyses of the same infrastructure.</p>
+          </div>
+          <div class="roadmap-card" aria-disabled="true">
+            <span class="roadmap-badge">Planned</span>
+            <h3>Per-hop Forensics</h3>
+            <p>TLS downgrade analysis for individual mail relay hops.</p>
+          </div>
+          <div class="roadmap-card" aria-disabled="true">
+            <span class="roadmap-badge">Planned</span>
+            <h3>Supervised Risk Classifier</h3>
+            <p>Machine-learning model trained on labelled captures.</p>
+          </div>
+          <div class="roadmap-card" aria-disabled="true">
+            <span class="roadmap-badge">Planned</span>
+            <h3>Live Capture Monitoring</h3>
+            <p>Continuous monitoring mode that analyses packets in real-time as they arrive.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Export section (rendered inline at bottom of overview or as floating buttons) -->
+      <section id="export" class="section">
+        <div class="section-header">
+          <h2>Export</h2>
+        </div>
+        <div class="export-empty" id="export-empty">
+          <p>No analysis report available for export.</p>
+        </div>
+        <div id="export-content" hidden>
+          <div class="export-buttons">
+            <a class="btn btn-secondary" id="export-json-btn" download>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export JSON
+            </a>
+            <a class="btn btn-secondary" id="export-html-btn" download>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export HTML
+            </a>
+            <a class="btn btn-secondary" id="export-cbom-btn" download>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CBOM
+            </a>
+            <a class="btn btn-secondary" id="export-pdf-btn" download>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export PDF
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer class="app-footer">NETRA · Passive cryptographic posture assessment for email infrastructure<br>© 2026 Krishna Chaittanyah Dummani and Team Grey Hats · MIT Licence · netra-framework.tech</footer>
+    </main>
+  </div>
+
+  <!-- Session drawer overlay -->
+  <div class="drawer-overlay" id="drawer-overlay" hidden></div>
+  <aside class="session-drawer" id="session-drawer" hidden role="dialog" aria-label="Session detail">
+    <div class="drawer-header" id="drawer-header">
+      <button class="drawer-close" id="drawer-close" aria-label="Close drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+
+  <!-- Evidence viewer modal -->
+  <div class="evidence-modal-overlay" id="evidence-overlay" hidden>
+    <div class="evidence-modal" id="evidence-modal" role="dialog" aria-label="Evidence viewer">
+      <div class="evidence-modal-header">
+        <h3 id="evidence-title">Evidence Viewer</h3>
+        <button class="drawer-close" id="evidence-close" aria-label="Close evidence viewer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="evidence-modal-body" id="evidence-body"></div>
+    </div>
+  </div>
+
+  <!-- App scripts -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

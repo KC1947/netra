@@ -1,0 +1,13 @@
+{
+  "_note": "Authoritative ML oracle. Fix the engine, never weaken these expectations.",
+  "anomaly_demo.pcap": {
+    "certificate": "cert_B.der",
+    "session_id": "s25",
+    "rank": 1,
+    "is_anomaly": true,
+    "disagrees_with_rules": true,
+    "normal_sessions": 40,
+    "max_normal_anomalies": 2
+  },
+  "sample.pcap": {"s1": {"is_anomaly": false}}
+}

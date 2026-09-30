@@ -1,0 +1,10 @@
+rule_id: KEX-NO-FS
+severity: medium
+confidence_band: certain
+confidence: 1.0
+what: "The negotiated key exchange provides no forward secrecy."
+why: "A key exchange that is not ephemeral means captured traffic can be decrypted retroactively if the server's long-term private key is ever recovered."
+fix: "Disable cipher suites without an ephemeral key exchange and require (EC)DHE."
+remediation_id: require_forward_secrecy
+remediation_effort: one_line_reload
+references: ["RFC 9325 Section 4.1"]

@@ -1,0 +1,10 @@
+rule_id: PQ-HYBRID-OBSERVED
+severity: info
+confidence_band: certain
+confidence: 1.0
+what: "The session negotiated a hybrid post-quantum key exchange ({group})."
+why: "A hybrid PQ key exchange is not retroactively decryptable by a future quantum computer, unlike classical-only (EC)DHE."
+fix: "No action needed; this session is already harvest-now-decrypt-later resistant."
+remediation_id: none
+remediation_effort: one_line_reload
+references: ["draft-ietf-tls-hybrid-design"]

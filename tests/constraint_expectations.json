@@ -1,0 +1,44 @@
+{
+    "_note": "Answer key, hand-written from the V4c server design in lab/generate_pcap.py. NEVER edit this to make a test pass. If the engine disagrees, investigate the engine first.",
+    "capture": "out/multiclient.pcap",
+    "servers": [
+      {
+        "server_id": "10.0.1.20:465",
+        "_comment": "Server A. Clients 1 and 2 offer the same two ciphers in opposite orders and BOTH receive ECDHE; client 3 offers only CBC and receives it, proving CBC is supported. Both facts together make server_order identifiable.",
+        "expected_preference_mode": "server_order",
+        "expected_matrix": {
+          "version:0x0303": "DEMONSTRATED",
+          "version:0x0304": "DEMONSTRATED",
+          "cipher:0xc02f": "DEMONSTRATED",
+          "cipher:0x002f": "DEMONSTRATED",
+          "cipher:0x1302": "DEMONSTRATED"
+        },
+        "min_deduced_coverage": 50
+      },
+      {
+        "server_id": "10.0.2.20:465",
+        "_comment": "Server B. Client 1 offers [ECDHE, CBC] and gets ECDHE; client 2 offers [CBC, ECDHE] and gets CBC. Each receives its own first choice, which only client_order explains.",
+        "expected_preference_mode": "client_order",
+        "expected_matrix": {
+          "version:0x0303": "DEMONSTRATED",
+          "version:0x0304": "DEMONSTRATED",
+          "cipher:0xc02f": "DEMONSTRATED",
+          "cipher:0x002f": "DEMONSTRATED",
+          "cipher:0x1301": "DEMONSTRATED",
+          "cipher:0x1302": "DEMONSTRATED"
+        },
+        "min_deduced_coverage": 50
+      },
+      {
+        "server_id": "10.0.3.20:465",
+        "_comment": "Server C, TLS 1.3 only. Sessions s13-s15 fail with no common version and contribute nothing. Clients 4 and 6 offer the two TLS 1.3 suites in opposite orders and both receive AES_128; client 5 offers only AES_256 and receives it. TLS 1.2 is NOT excluded here: exclusion requires a client to offer a version ABOVE the one negotiated.",
+        "expected_preference_mode": "server_order",
+        "expected_matrix": {
+          "version:0x0304": "DEMONSTRATED",
+          "cipher:0x1301": "DEMONSTRATED",
+          "cipher:0x1302": "DEMONSTRATED"
+        },
+        "min_deduced_coverage": 25
+      }
+    ]
+  }

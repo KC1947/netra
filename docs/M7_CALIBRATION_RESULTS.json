@@ -1,0 +1,169 @@
+{
+  "real_mail": {
+    "sessions": 37,
+    "flagged": 0,
+    "flag_rate": 0.0,
+    "flagged_session_ids": [],
+    "abstained": 0,
+    "abstention_rate": 0.0,
+    "percentiles": {
+      "min": 15.517241379310345,
+      "median": 79.3103448275862,
+      "max": 98.27586206896552
+    },
+    "normal_sessions": 37,
+    "false_alerts": 0,
+    "false_alerts_per_1000": 0.0,
+    "label_basis": "Assumed-benign recorded mail; no independent attack labels.",
+    "planted_anomalies": null,
+    "precision_at_k": null,
+    "top_10_session_ids": [
+      "s13",
+      "s9",
+      "s2",
+      "s4",
+      "s37",
+      "s31",
+      "s36",
+      "s30",
+      "s35",
+      "s11"
+    ],
+    "non_ml_diff": "",
+    "deterministic": true,
+    "calibration": {
+      "schema_version": "m7-baseline-v2",
+      "split": "GroupKFold(3), reference-containing calibration fold; scoring capture excluded by SHA-256",
+      "corpus_sessions": 215,
+      "training": [
+        {
+          "path": "out/m7_baseline/benign_101.pcap",
+          "sha256": "1da01aaf6c33df8904a92341487f2b883e328e3ec77eb85d489d2f4eff414640",
+          "sessions": 40
+        },
+        {
+          "path": "out/m7_baseline/benign_102.pcap",
+          "sha256": "2df8204038fd4c1ee59d78ca0ffa0208b2f38c94419de0d1b137e3c9025bff3d",
+          "sessions": 40
+        },
+        {
+          "path": "out/m7_baseline/benign_104.pcap",
+          "sha256": "7040d5d4af2c19f34cc76eede75b8131dbfed2049428fa8bcdbc488ef69e5bf7",
+          "sessions": 40
+        }
+      ],
+      "calibration": [
+        {
+          "path": "out/m7_baseline/benign_103.pcap",
+          "sha256": "434aebe7837911b0e7a810ebc3b3272bbc2c79243e700d040067b0f1197d1098",
+          "sessions": 40
+        },
+        {
+          "path": "tests/fixtures/mixed_enterprise.pcap",
+          "sha256": "13bb74efd4f5b7decddc02b4c1a09b88ff4d1a8632326acafdeb6f3ae65515b5",
+          "sessions": 18
+        }
+      ],
+      "scoring_capture_excluded": true,
+      "active_components": {
+        "isolation_forest": true,
+        "hbos": true
+      }
+    }
+  },
+  "mixed_enterprise": {
+    "sessions": 25,
+    "flagged": 3,
+    "flag_rate": 0.12,
+    "flagged_session_ids": [
+      "s19",
+      "s21",
+      "s22"
+    ],
+    "abstained": 0,
+    "abstention_rate": 0.0,
+    "percentiles": {
+      "min": 16.883116883116884,
+      "median": 44.15584415584416,
+      "max": 100.0
+    },
+    "normal_sessions": 18,
+    "false_alerts": 1,
+    "false_alerts_per_1000": 55.55555555555556,
+    "label_basis": "Enterprise answer-key planted risks; all other sessions treated as normal.",
+    "planted_anomalies": {
+      "s3": "static RSA/CBC",
+      "s8": "static RSA/CBC",
+      "s19": "legacy TLS and expired certificate",
+      "s21": "legacy TLS and weak self-signed certificate",
+      "s23": "cleartext authentication",
+      "s24": "suspected STARTTLS stripping",
+      "s25": "downgrade sentinel with TLS 1.3 offered"
+    },
+    "precision_at_k": {
+      "5": {
+        "true_positives": 2,
+        "k": 5,
+        "value": 0.4
+      },
+      "10": {
+        "true_positives": 5,
+        "k": 10,
+        "value": 0.5
+      }
+    },
+    "top_10_session_ids": [
+      "s21",
+      "s19",
+      "s22",
+      "s17",
+      "s18",
+      "s20",
+      "s24",
+      "s23",
+      "s25",
+      "s13"
+    ],
+    "non_ml_diff": "",
+    "deterministic": true,
+    "calibration": {
+      "schema_version": "m7-baseline-v2",
+      "split": "GroupKFold(3), reference-containing calibration fold; scoring capture excluded by SHA-256",
+      "corpus_sessions": 215,
+      "training": [
+        {
+          "path": "out/m7_baseline/benign_101.pcap",
+          "sha256": "1da01aaf6c33df8904a92341487f2b883e328e3ec77eb85d489d2f4eff414640",
+          "sessions": 40
+        },
+        {
+          "path": "out/m7_baseline/benign_102.pcap",
+          "sha256": "2df8204038fd4c1ee59d78ca0ffa0208b2f38c94419de0d1b137e3c9025bff3d",
+          "sessions": 40
+        },
+        {
+          "path": "out/m7_baseline/benign_104.pcap",
+          "sha256": "7040d5d4af2c19f34cc76eede75b8131dbfed2049428fa8bcdbc488ef69e5bf7",
+          "sessions": 40
+        }
+      ],
+      "calibration": [
+        {
+          "path": "out/m7_baseline/benign_103.pcap",
+          "sha256": "434aebe7837911b0e7a810ebc3b3272bbc2c79243e700d040067b0f1197d1098",
+          "sessions": 40
+        },
+        {
+          "path": "tests/fixtures/real_mail.pcap",
+          "sha256": "5dae831e40f07b1cbbd55d6aec947644c474ddf5f9964a52e32c853b2d6ac3c4",
+          "sessions": 37
+        }
+      ],
+      "scoring_capture_excluded": true,
+      "active_components": {
+        "isolation_forest": true,
+        "hbos": true
+      }
+    }
+  }
+}

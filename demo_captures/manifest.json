@@ -1,0 +1,133 @@
+[
+  {
+    "description": "2,482 measured frames; 25 mail sessions across 10 server identities; 1 firm support exclusions; 1 server-order, 1 client-order, and 8 unknown preference modes; HNDL 24/25 exposed.",
+    "expected": [
+      "25 sessions",
+      "10 server identities",
+      "HNDL: 96% exposed"
+    ],
+    "file": "mixed_enterprise.pcap",
+    "id": "mixed_enterprise",
+    "packets": 2482,
+    "sha256": "13bb74efd4f5b7decddc02b4c1a09b88ff4d1a8632326acafdeb6f3ae65515b5",
+    "size_bytes": 278350,
+    "source": "fixture",
+    "title": "Mixed enterprise mail traffic"
+  },
+  {
+    "description": "STARTTLS completed with TLS 1.3 and forward secrecy.",
+    "expected": [
+      "verdict: upgraded",
+      "TLS: TLS1.3"
+    ],
+    "file": "clean_tls13.pcap",
+    "id": "clean_tls13",
+    "packets": 9,
+    "sha256": "4deccc4744046e1281bded04157eadefaf762e8d5e5d7cbfa4adf60602ef722d",
+    "size_bytes": 1065,
+    "source": "synthetic",
+    "title": "Clean TLS 1.3 SMTP"
+  },
+  {
+    "description": "TLS 1.3 offer negotiated down to legacy TLS 1.0.",
+    "expected": [
+      "verdict: upgraded",
+      "TLS: TLS1.0",
+      "certificate: INVALID",
+      "TLS-VER-DEPRECATED"
+    ],
+    "file": "legacy_downgrade.pcap",
+    "id": "legacy_downgrade",
+    "packets": 9,
+    "sha256": "d7a251c8e44deb1077afd5c8769f848d9abef1b769fdfc8479abc5a81cccf9e4",
+    "size_bytes": 1410,
+    "source": "synthetic",
+    "title": "Legacy TLS downgrade"
+  },
+  {
+    "description": "SMTP authentication was observed before TLS.",
+    "expected": [
+      "verdict: not_used",
+      "STARTTLS-NOT-OFFERED"
+    ],
+    "file": "cleartext_auth.pcap",
+    "id": "cleartext_auth",
+    "packets": 5,
+    "sha256": "fd96093d9360930392fbe6987fdb2fa740698b9b4e17c97a1693ed681958a98e",
+    "size_bytes": 539,
+    "source": "synthetic",
+    "title": "Cleartext authentication"
+  },
+  {
+    "description": "A mangled SMTP capability is followed by cleartext authentication.",
+    "expected": [
+      "verdict: suspected",
+      "STARTTLS-STRIP-SUSPECTED"
+    ],
+    "file": "strip_attack.pcap",
+    "id": "strip_attack",
+    "packets": 5,
+    "sha256": "5f107d468eb467cc5409722a5c6cf2008a2e87243f3463f8fd64f173cd39d2bb",
+    "size_bytes": 553,
+    "source": "synthetic",
+    "title": "STARTTLS stripping attempt"
+  },
+  {
+    "description": "Implicit TLS 1.2 with a certificate invalid at capture time.",
+    "expected": [
+      "verdict: upgraded",
+      "TLS: TLS1.2",
+      "certificate: INVALID",
+      "CERT-EXPIRED"
+    ],
+    "file": "expired_cert.pcap",
+    "id": "expired_cert",
+    "packets": 5,
+    "sha256": "0c6863df0136189caac29a902feb15893118f431ad84dba7c650e5198f3e8960",
+    "size_bytes": 1318,
+    "source": "synthetic",
+    "title": "Expired IMAPS certificate"
+  },
+  {
+    "description": "Implicit TLS 1.3 uses the X25519MLKEM768 hybrid group.",
+    "expected": [
+      "verdict: upgraded",
+      "TLS: TLS1.3",
+      "PQ-HYBRID-OBSERVED"
+    ],
+    "file": "pq_ready.pcap",
+    "id": "pq_ready",
+    "packets": 4,
+    "sha256": "0636c69df4e5c6b1cb7156f037c2603dbdb2ff22dbd5f32e46d37bf4fa6545a0",
+    "size_bytes": 570,
+    "source": "synthetic",
+    "title": "Hybrid PQ TLS 1.3"
+  },
+  {
+    "description": "One IMAPS server normally presents cert_A; one session presents cert_B.",
+    "expected": [
+      "cert_B unusual",
+      "rules/AI disagreement expected"
+    ],
+    "file": "anomaly_certswap.pcap",
+    "id": "anomaly_certswap",
+    "packets": 205,
+    "sha256": "fd7ab97cd688cf68df03173bff0f2837f44bc6946c30bb9e91d38118d714a8cd",
+    "size_bytes": 53734,
+    "source": "synthetic",
+    "title": "Certificate swap anomaly"
+  },
+  {
+    "description": "Locally recorded mail traffic; results depend on observable packets.",
+    "expected": [
+      "facts depend on observed packets"
+    ],
+    "file": "real_mail.pcap",
+    "id": "real_mail",
+    "packets": 1323,
+    "sha256": "5dae831e40f07b1cbbd55d6aec947644c474ddf5f9964a52e32c853b2d6ac3c4",
+    "size_bytes": 288532,
+    "source": "real",
+    "title": "Recorded mail traffic"
+  }
+]
